@@ -63,4 +63,8 @@ spec:
               value: "http://user-service"
             - name: USER_SERVICE_PORT
               value: "9000"
+            - name: TOPIC_USER_FOLLOW_REQUESTED
+              value: "user-follow-requested"
+            - name: TOPIC_USER_FOLLOW_REQUEST_DECISION
+              value: "user-follow-request-decision"
 
