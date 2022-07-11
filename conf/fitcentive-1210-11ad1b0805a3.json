@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "fitcentive-1210",
+  "private_key_id": "11ad1b0805a3e2761d9ef9662d2a11a6bef68754",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEugIBADANBgkqhkiG9w0BAQEFAASCBKQwggSgAgEAAoIBAQCwdpK1LE5JHoIw\n2HBHKUj/cNItoV+xW6EIaTuHOo2OUaBGjvNm9Af4Dxko5nQ87heh8hIdjn8ljbRO\nHGjsM82oy3MKCeHKCA72ltReTAvv+b8wNhcNnDchqS8CRKiC/I6jVHLMF/NkP+ZF\n3nG9xMuLp81AjdWqXpztBhhqPLMdU/s99GUBoKX6LuBcq7ZzZ83AsbOf/VTJE60R\nCZRB/8Cpv7MCSkwQvhePeEzeDs8TyWcf9fVxHZDhPhqPnfgr7rtzNgnNFDj3kWXa\nCRKkWK1VwOaVYvwiyh3FIB4hsEBdYPONRli3K7j8Gt42yRwTS5eZ//yEZMFfaDq5\nig5+BdnpAgMBAAECgf9P9WqErY7LkwdrGqfFlu98z6JtCrJRqzNMnGJc5CtAUbxO\nPHgOLoVt4WmFHueMtFYBC68ptWfnnE4XFsh0PwTxdz6pTdEBuqUNF0sjb1H5azE2\np0vK3v4cQo0KehHhSI9ZcuqRkEi5JDszbZgcZQ/WODLJDXvDtxtkS17ExLxkjOit\nIgck97RAMTLsUkWRNmw1YxkWI5nI7jfPz+21CMN7syRAGWOjyhpVAYXLWs5lRfYD\n01GdGc7IgcFnadVMavtd0u47+h8zkbTUDFyLyds48hbZFkUx+vPrP7oDxuyTDsP4\nXSyrK4Q4iTzR83wmsO+LkkNS0OsM2qmAw/d6QBECgYEA1MdA9PjtK6drEJszqGq2\n8HczLx+WHqg96dfptxALB+pNoDJ5Nb1x2q6I2mqE7g22TWcoRJgWRUBMItJwO2Q4\ntep7w1OCSu9mRUyIMT1ejnK8ThrOSJvsgezc3hR17C2+nc114z12cmLZ0OH/GTCB\nw7QHtGOQGAo1S2nO+Z/ynp8CgYEA1E7ib2wFd6JxKfvoLS0jpS9uZI9UCih9evbZ\n0QOxedAUAURAOjY2vJxICyr7T+tqluD/tn/Tm1U3ZkfXJSPYto/G3GpTWcaktb6Y\nvMe/2nLnN9Sst1FY3kYpjLYMHnHhlbAUja3p1S81AYK3rsxUq6cOxidG4wHW4Ugq\nmL6zIncCgYAxYQBRGYeoztSI6Qum9QT5byBAulrTSIX9w66oXh/BOX3ERJJeh1Vp\nw4Fc9sVcnXAGLH9q08SvU4mXtzB2h/6lMQKBxNqC22XnhShCDRTph/TtR0lCDnVn\nfXmQTD1FjyQiaPEHyFa5mvkjgZ760If8y8XR9h0VhyDxHF/9DEJ4zwKBgCyHxzK7\no4HuTnIR5ibjmuBgzHTHI0dmKruJ3zHZ5nW4URna6OXMzTpORUYiY8flhtvSoY/z\ny7x+6TnIw7WEiUXxbjJ5ErZ31cBRE9Q0yWbWRu0M7JUeuNcWPEzJOk2AcWJmJkl5\nOtx+JE4GzuQY84F1bsHdJx8iGaHy8wxKo2QNAoGACbqVAa02WOKhRl9cr70/5Ybn\nsxim3jq5BXjF/3A0rNR0c1dgfDzPwkExmrnSHjO7QyCkyerLH6bCjb17t7Fn7JFN\neCGanhNHCFJz+eRX6rajFofk+RPjpw495XRXKYQvdynwouXqHVbqxNxEI3kwHbIC\n1Y/roif9DhWl8m1XLWQ=\n-----END PRIVATE KEY-----\n",
+  "client_email": "social-service@fitcentive-1210.iam.gserviceaccount.com",
+  "client_id": "108378035785762129140",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/social-service%40fitcentive-1210.iam.gserviceaccount.com"
+}

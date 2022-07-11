@@ -1,0 +1,35 @@
+
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET     /api/social/health                                                                        io.fitcentive.social.controllers.HealthController.healthCheck
+
+# User relationships endpoints
+POST    /api/social/user/:currentUserId/unfollow/:targetUserId                                    io.fitcentive.social.controllers.UserRelationshipsController.unfollowUser(currentUserId: java.util.UUID, targetUserId: java.util.UUID)
+POST    /api/social/user/:currentUserId/follow/:followingUserId/remove                            io.fitcentive.social.controllers.UserRelationshipsController.removeFollower(currentUserId: java.util.UUID, followingUserId: java.util.UUID)
+GET     /api/social/user/:userId/followers                                                        io.fitcentive.social.controllers.UserRelationshipsController.getUserFollowers(userId: java.util.UUID)
+GET     /api/social/user/:userId/following                                                        io.fitcentive.social.controllers.UserRelationshipsController.getUserFollowing(userId: java.util.UUID)
+
+POST    /api/social/user/:currentUserId/follow/:targetUserId/request                              io.fitcentive.social.controllers.UserRelationshipsController.requestToFollowUser(currentUserId: java.util.UUID, targetUserId: java.util.UUID)
+POST    /api/social/user/:targetUserId/follow/:requestingUserId                                   io.fitcentive.social.controllers.UserRelationshipsController.applyUserFollowRequestDecision(targetUserId: java.util.UUID, requestingUserId: java.util.UUID)
+GET     /api/social/user/:currentUserId/follow-status/:targetUserId                               io.fitcentive.social.controllers.UserRelationshipsController.getUserFollowStatus(currentUserId: java.util.UUID, targetUserId: java.util.UUID)
+
+
+# Internal routes
+POST    /api/internal/social/user                                                                 io.fitcentive.social.controllers.UserRelationshipsController.upsertUser
+
+
+# Social media endpoints
+GET     /api/social/user/:userId/post                                                             io.fitcentive.social.controllers.SocialMediaController.getPostsForUser(userId: java.util.UUID)
+POST    /api/social/user/:userId/post                                                             io.fitcentive.social.controllers.SocialMediaController.createPostForUser(userId: java.util.UUID)
+GET     /api/social/user/:userId/newsfeed                                                         io.fitcentive.social.controllers.SocialMediaController.getNewsfeedForUser(userId: java.util.UUID)
+
+POST    /api/social/user/:userId/post/:postId/like                                                io.fitcentive.social.controllers.SocialMediaController.likePostForUser(userId: java.util.UUID, postId: java.util.UUID)
+POST    /api/social/user/:userId/post/:postId/unlike                                              io.fitcentive.social.controllers.SocialMediaController.unlikePostForUser(userId: java.util.UUID, postId: java.util.UUID)
+POST    /api/social/user/:userId/post/:postId/comment                                             io.fitcentive.social.controllers.SocialMediaController.addCommentToPost(userId: java.util.UUID, postId: java.util.UUID)
+
+GET     /api/social/post/:postId/comment                                                          io.fitcentive.social.controllers.SocialMediaController.getCommentsForPost(postId: java.util.UUID)
+GET     /api/social/post/:postId/liked-users                                                      io.fitcentive.social.controllers.SocialMediaController.getUsersWhoLikedPost(postId: java.util.UUID)
+POST    /api/social/posts/get-liked-user-ids                                                      io.fitcentive.social.controllers.SocialMediaController.getUserIdsWhoLikedPosts
+
