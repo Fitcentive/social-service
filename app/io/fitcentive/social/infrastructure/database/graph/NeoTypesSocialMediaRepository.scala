@@ -126,6 +126,7 @@ object NeoTypesSocialMediaRepository {
   private def CYPHER_GET_COMMENTS_FOR_POST(postId: UUID): DeferredQueryBuilder = {
     c"""
      MATCH (post: Post { postId: $postId })-[rel:HAS_COMMENT]->(comment: Comment)
+     ORDER BY comment.createdAt
      RETURN comment
      """
   }
