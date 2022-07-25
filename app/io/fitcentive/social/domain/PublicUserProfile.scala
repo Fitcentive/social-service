@@ -1,5 +1,6 @@
 package io.fitcentive.social.domain
 
+import io.fitcentive.social.domain.location.Coordinates
 import play.api.libs.json.{Json, Reads, Writes}
 
 import java.time.LocalDate
@@ -11,7 +12,9 @@ case class PublicUserProfile(
   firstName: Option[String],
   lastName: Option[String],
   photoUrl: Option[String],
-  dateOfBirth: Option[LocalDate]
+  dateOfBirth: Option[LocalDate],
+  locationCenter: Option[Coordinates],
+  locationRadius: Option[Int]
 )
 
 object PublicUserProfile {
