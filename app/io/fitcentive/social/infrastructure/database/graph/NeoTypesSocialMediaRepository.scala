@@ -3,6 +3,7 @@ package io.fitcentive.social.infrastructure.database.graph
 import io.fitcentive.social.domain.{Post, PostComment, PublicUserProfile}
 import io.fitcentive.social.domain.types.CustomTypes.GraphDb
 import io.fitcentive.social.infrastructure.contexts.Neo4jExecutionContext
+import io.fitcentive.social.infrastructure.database.graph.NeoTypesUserRelationshipsRepository.PublicNeo4jUserProfile
 import io.fitcentive.social.repositories.SocialMediaRepository
 import neotypes.DeferredQueryBuilder
 import neotypes.implicits.syntax.string._
@@ -20,8 +21,9 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
 
   override def getUserIfLikedPost(userId: UUID, postId: UUID): Future[Option[PublicUserProfile]] =
     CYPHER_GET_USER_IF_LIKED_POST(userId, postId)
-      .readOnlyQuery[Option[PublicUserProfile]]
+      .readOnlyQuery[Option[PublicNeo4jUserProfile]]
       .single(db)
+      .map(_.map(_.toPublicUserProfile))
 
   override def makeUserLikePost(userId: UUID, postId: UUID): Future[Unit] =
     CYPHER_MAKE_USER_LIKE_POST(userId, postId)
@@ -35,8 +37,9 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
 
   override def getUsersWhoLikedPost(postId: UUID): Future[Seq[PublicUserProfile]] =
     CYPHER_GET_USERS_WHO_LIKED_POST(postId)
-      .readOnlyQuery[PublicUserProfile]
+      .readOnlyQuery[PublicNeo4jUserProfile]
       .list(db)
+      .map(_.map(_.toPublicUserProfile))
 
   override def addCommentToPost(comment: PostComment.Create): Future[PostComment] =
     CYPHER_ADD_COMMENT_TO_POST(comment)
