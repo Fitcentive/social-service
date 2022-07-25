@@ -71,7 +71,8 @@ object NeoTypesUserRelationshipsRepository {
     photoUrl: Option[String],
     dateOfBirth: Option[LocalDate],
     locationCenter: Option[Point],
-    locationRadius: Option[Int]
+    locationRadius: Option[Int],
+    gender: Option[String],
   ) {
     def toPublicUserProfile: PublicUserProfile =
       PublicUserProfile(
@@ -82,7 +83,8 @@ object NeoTypesUserRelationshipsRepository {
         photoUrl = photoUrl,
         dateOfBirth = dateOfBirth,
         locationCenter = locationCenter.map(c => Coordinates(latitude = c.y, longitude = c.x)),
-        locationRadius = locationRadius
+        locationRadius = locationRadius,
+        gender = gender,
       )
   }
 
@@ -96,7 +98,8 @@ object NeoTypesUserRelationshipsRepository {
         user.photoUrl = ${user.photoUrl},
         user.dateOfBirth = ${user.dateOfBirth},
         user.locationRadius = ${user.locationRadius},
-        user.locationCenter =  ${user.locationCenter.map(_.toNeo4jPoint)}
+        user.locationCenter =  ${user.locationCenter.map(_.toNeo4jPoint)},
+        user.gender = ${user.gender}
 
       RETURN user"""
 
