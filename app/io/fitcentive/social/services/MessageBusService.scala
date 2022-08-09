@@ -10,4 +10,6 @@ import scala.concurrent.Future
 trait MessageBusService {
   def publishUserFollowRequestNotification(requestingUser: UUID, targetUser: UUID): Future[Unit]
   def publishUserFollowRequestDecision(targetUser: UUID, isApproved: Boolean): Future[Unit]
+  def publishUserCommentedOnPostNotification(commentingUser: UUID, targetUser: UUID, postId: UUID): Future[Unit]
+  def publishUserLikedPostNotification(likingUser: UUID, targetUser: UUID, postId: UUID): Future[Unit]
 }

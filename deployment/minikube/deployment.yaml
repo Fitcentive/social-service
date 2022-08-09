@@ -67,4 +67,8 @@ spec:
               value: "user-follow-requested"
             - name: TOPIC_USER_FOLLOW_REQUEST_DECISION
               value: "user-follow-request-decision"
+            - name: TOPIC_USER_COMMENTED_ON_POST
+              value: "user-commented-on-post"
+            - name: TOPIC_USER_LIKED_POST
+              value: "user-liked-post"
 

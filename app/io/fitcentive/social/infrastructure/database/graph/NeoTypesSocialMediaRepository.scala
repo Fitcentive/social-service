@@ -19,6 +19,11 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
 
   import NeoTypesSocialMediaRepository._
 
+  override def getPostById(postId: UUID): Future[Option[Post]] =
+    CYPHER_GET_POST_BY_ID(postId)
+      .readOnlyQuery[Option[Post]]
+      .single(db)
+
   override def getUserIfLikedPost(userId: UUID, postId: UUID): Future[Option[PublicUserProfile]] =
     CYPHER_GET_USER_IF_LIKED_POST(userId, postId)
       .readOnlyQuery[Option[PublicNeo4jUserProfile]]
@@ -68,6 +73,20 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
 }
 
 object NeoTypesSocialMediaRepository {
+  private def CYPHER_GET_POST_BY_ID(postId: UUID): DeferredQueryBuilder =
+    c"""
+      OPTIONAL MATCH (post: Post { postId: $postId })
+      WITH post
+      OPTIONAL MATCH (u: User)-[rel:LIKED]->(post)
+      WITH post, count(rel) AS numberOfLikes
+      OPTIONAL MATCH (post)-[:HAS_COMMENT]->(c: Comment)
+      WITH
+        post.postId AS postId, post.userId AS userId, post.text AS text,
+        numberOfLikes, count(c) AS numberOfComments,
+        post.photoUrl AS photoUrl, post.createdAt AS createdAt, post.updatedAt AS updatedAt
+      ORDER BY updatedAt DESC
+      RETURN postId, userId, text, numberOfLikes, numberOfComments, photoUrl, createdAt, updatedAt"""
+
   private def CYPHER_GET_USER_IF_LIKED_POST(userId: UUID, postId: UUID): DeferredQueryBuilder = {
     c"""
      OPTIONAL MATCH (u: User { userId: $userId })-[rel:LIKED]->(p: Post { postId: $postId })
