@@ -98,6 +98,14 @@ class SocialMediaController @Inject() (
         .recover(resultErrorAsyncHandler)
     }
 
+  def getPostById(postId: UUID): Action[AnyContent] =
+    userAuthAction.async { implicit userRequest =>
+      socialMediaApi
+        .getPostById(postId)
+        .map(handleEitherResult(_)(post => Ok(Json.toJson(post))))
+        .recover(resultErrorAsyncHandler)
+    }
+
   def addCommentToPost(userId: UUID, postId: UUID): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
       validateJson[CreateCommentPayload](userRequest.request.body.asJson) { comment =>

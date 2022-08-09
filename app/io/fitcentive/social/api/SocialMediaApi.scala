@@ -99,4 +99,9 @@ class SocialMediaApi @Inject() (
   def getCommentsForPost(postId: UUID): Future[Seq[PostComment]] =
     socialMediaRepository.getCommentsForPost(postId)
 
+  def getPostById(postId: UUID): Future[Either[DomainError, Post]] =
+    socialMediaRepository
+      .getPostById(postId)
+      .map(_.map(Right.apply).getOrElse(Left(EntityNotFoundError("Post not found!"))))
+
 }
