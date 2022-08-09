@@ -89,10 +89,19 @@ class SocialMediaApi @Inject() (
           .getPostById(comment.postId)
           .map(_.map(Right.apply).getOrElse(Left(EntityNotFoundError("Post not found!"))))
       )
+      // Generate notifications for every distinct user who has participated in the conversation
+      postComments <- EitherT.right[DomainError](socialMediaRepository.getCommentsForPost(post.postId))
+      // commentParticipants defined as OP + distinct(commenters)
+      commentParticipants = (postComments.map(_.userId) :+ post.userId).distinct
+      notificationTargets = commentParticipants.filterNot(_ == comment.userId)
       _ <- EitherT.right[DomainError] {
-        if (post.userId != comment.userId)
-          messageBusService.publishUserCommentedOnPostNotification(comment.userId, post.userId, comment.postId)
-        else Future.unit
+        Future.sequence(
+          notificationTargets.map(
+            targetUserId =>
+              messageBusService
+                .publishUserCommentedOnPostNotification(comment.userId, targetUserId, comment.postId, post.userId)
+          )
+        )
       }
     } yield comment).value
 

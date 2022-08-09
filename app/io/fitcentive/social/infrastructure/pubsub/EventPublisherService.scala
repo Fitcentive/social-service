@@ -24,8 +24,9 @@ class EventPublisherService @Inject() (publisher: PubSubPublisher, settingsServi
     commentingUser: UUID,
     targetUser: UUID,
     postId: UUID,
+    postCreatorId: UUID,
   ): Future[Unit] =
-    UserCommentedOnPost(commentingUser, targetUser, postId)
+    UserCommentedOnPost(commentingUser, targetUser, postId, postCreatorId)
       .pipe(publisher.publish(publisherConfig.userCommentedOnPostTopic, _))
 
   override def publishUserLikedPostNotification(likingUser: UUID, targetUser: UUID, postId: UUID): Future[Unit] =
