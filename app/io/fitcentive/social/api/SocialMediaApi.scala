@@ -52,7 +52,10 @@ class SocialMediaApi @Inject() (
           .getPostById(postId)
           .map(_.map(Right.apply).getOrElse(Left(EntityNotFoundError("Post not found!"))))
       )
-      _ <- EitherT.right[DomainError](messageBusService.publishUserLikedPostNotification(userId, post.userId, postId))
+      _ <- EitherT.right[DomainError] {
+        if (post.userId != userId) messageBusService.publishUserLikedPostNotification(userId, post.userId, postId)
+        else Future.unit
+      }
     } yield ()).value
 
   def unlikePostForUser(postId: UUID, userId: UUID): Future[Either[DomainError, Unit]] =
@@ -86,9 +89,11 @@ class SocialMediaApi @Inject() (
           .getPostById(comment.postId)
           .map(_.map(Right.apply).getOrElse(Left(EntityNotFoundError("Post not found!"))))
       )
-      _ <- EitherT.right[DomainError](
-        messageBusService.publishUserCommentedOnPostNotification(comment.userId, post.userId, comment.postId)
-      )
+      _ <- EitherT.right[DomainError] {
+        if (post.userId != comment.userId)
+          messageBusService.publishUserCommentedOnPostNotification(comment.userId, post.userId, comment.postId)
+        else Future.unit
+      }
     } yield comment).value
 
   def getCommentsForPost(postId: UUID): Future[Seq[PostComment]] =
