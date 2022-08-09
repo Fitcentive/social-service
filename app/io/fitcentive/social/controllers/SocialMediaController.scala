@@ -103,7 +103,7 @@ class SocialMediaController @Inject() (
       validateJson[CreateCommentPayload](userRequest.request.body.asJson) { comment =>
         socialMediaApi
           .addCommentToPost(PostComment.Create(postId = postId, userId = userId, text = comment.text))
-          .map(commentResponse => Ok(Json.toJson(commentResponse)))
+          .map(handleEitherResult(_)(commentResponse => Ok(Json.toJson(commentResponse))))
           .recover(resultErrorAsyncHandler)
       }
     }
