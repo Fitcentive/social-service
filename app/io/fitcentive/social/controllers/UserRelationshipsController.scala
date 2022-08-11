@@ -44,21 +44,21 @@ class UserRelationshipsController @Inject() (
       }(userRequest, currentUserId)
     }
 
-  def getUserFollowers(implicit userId: UUID): Action[AnyContent] =
+  def getUserFollowers(implicit userId: UUID, skip: Int = 0, limit: Int = 50): Action[AnyContent] =
     userAuthAction.async { implicit request =>
       rejectIfNotEntitled {
         userRelationshipsApi
-          .getUserFollowers(userId)
+          .getUserFollowers(userId, skip, limit)
           .map(users => Ok(Json.toJson(users)))
           .recover(resultErrorAsyncHandler)
       }
     }
 
-  def getUserFollowing(implicit userId: UUID): Action[AnyContent] =
+  def getUserFollowing(implicit userId: UUID, skip: Int = 0, limit: Int = 50): Action[AnyContent] =
     userAuthAction.async { implicit request =>
       rejectIfNotEntitled {
         userRelationshipsApi
-          .getUserFollowing(userId)
+          .getUserFollowing(userId, skip, limit)
           .map(users => Ok(Json.toJson(users)))
           .recover(resultErrorAsyncHandler)
       }

@@ -8,8 +8,8 @@ GET     /api/social/health                                                      
 # User relationships endpoints
 POST    /api/social/user/:currentUserId/unfollow/:targetUserId                                    io.fitcentive.social.controllers.UserRelationshipsController.unfollowUser(currentUserId: java.util.UUID, targetUserId: java.util.UUID)
 POST    /api/social/user/:currentUserId/follow/:followingUserId/remove                            io.fitcentive.social.controllers.UserRelationshipsController.removeFollower(currentUserId: java.util.UUID, followingUserId: java.util.UUID)
-GET     /api/social/user/:userId/followers                                                        io.fitcentive.social.controllers.UserRelationshipsController.getUserFollowers(userId: java.util.UUID)
-GET     /api/social/user/:userId/following                                                        io.fitcentive.social.controllers.UserRelationshipsController.getUserFollowing(userId: java.util.UUID)
+GET     /api/social/user/:userId/followers                                                        io.fitcentive.social.controllers.UserRelationshipsController.getUserFollowers(userId: java.util.UUID, skip: Int ?= 0, limit: Int ?= 50)
+GET     /api/social/user/:userId/following                                                        io.fitcentive.social.controllers.UserRelationshipsController.getUserFollowing(userId: java.util.UUID, skip: Int ?= 0, limit: Int ?= 50)
 
 POST    /api/social/user/:currentUserId/follow/:targetUserId/request                              io.fitcentive.social.controllers.UserRelationshipsController.requestToFollowUser(currentUserId: java.util.UUID, targetUserId: java.util.UUID)
 POST    /api/social/user/:targetUserId/follow/:requestingUserId                                   io.fitcentive.social.controllers.UserRelationshipsController.applyUserFollowRequestDecision(targetUserId: java.util.UUID, requestingUserId: java.util.UUID)

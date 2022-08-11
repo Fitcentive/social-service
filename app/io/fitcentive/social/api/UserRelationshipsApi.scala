@@ -53,11 +53,11 @@ class UserRelationshipsApi @Inject() (
   def unfollowUser(currentUserId: UUID, targetUserId: UUID): Future[Unit] =
     userRelationshipsRepository.makeUserUnFollowOther(currentUserId, targetUserId)
 
-  def getUserFollowers(currentUserId: UUID): Future[Seq[PublicUserProfile]] =
-    userRelationshipsRepository.getUserFollowers(currentUserId)
+  def getUserFollowers(currentUserId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
+    userRelationshipsRepository.getUserFollowers(currentUserId, skip, limit)
 
-  def getUserFollowing(currentUserId: UUID): Future[Seq[PublicUserProfile]] =
-    userRelationshipsRepository.getUserFollowing(currentUserId)
+  def getUserFollowing(currentUserId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
+    userRelationshipsRepository.getUserFollowing(currentUserId, skip, limit)
 
   def getUserFollowStatus(currentUserId: UUID, otherUserId: UUID): Future[UserFollowStatus] =
     for {

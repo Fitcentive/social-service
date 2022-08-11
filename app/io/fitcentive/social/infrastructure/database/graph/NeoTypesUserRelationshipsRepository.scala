@@ -42,14 +42,14 @@ class NeoTypesUserRelationshipsRepository @Inject() (val db: GraphDb)(implicit v
       .single(db)
       .map(_.toPublicUserProfile)
 
-  override def getUserFollowers(userId: UUID): Future[Seq[PublicUserProfile]] =
-    CYPHER_GET_USER_FOLLOWERS(userId)
+  override def getUserFollowers(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
+    CYPHER_GET_USER_FOLLOWERS(userId, skip, limit)
       .readOnlyQuery[PublicNeo4jUserProfile]
       .list(db)
       .map(_.map(_.toPublicUserProfile))
 
-  override def getUserFollowing(userId: UUID): Future[Seq[PublicUserProfile]] =
-    CYPHER_GET_USER_FOLLOWING(userId)
+  override def getUserFollowing(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
+    CYPHER_GET_USER_FOLLOWING(userId, skip, limit)
       .readOnlyQuery[PublicNeo4jUserProfile]
       .list(db)
       .map(_.map(_.toPublicUserProfile))
@@ -110,15 +110,19 @@ object NeoTypesUserRelationshipsRepository {
        MERGE (u1)-[r:IS_FOLLOWING]->(u2)
        RETURN u2"""
 
-  private def CYPHER_GET_USER_FOLLOWERS(currentUserId: UUID): DeferredQueryBuilder =
+  private def CYPHER_GET_USER_FOLLOWERS(currentUserId: UUID, skip: Int, limit: Int): DeferredQueryBuilder =
     c"""
        MATCH (u1: User)-[r:IS_FOLLOWING]->(u2: User { userId: $currentUserId})
-       RETURN u1"""
+       RETURN u1
+       SKIP $skip
+       LIMIT $limit"""
 
-  private def CYPHER_GET_USER_FOLLOWING(currentUserId: UUID): DeferredQueryBuilder =
+  private def CYPHER_GET_USER_FOLLOWING(currentUserId: UUID, skip: Int, limit: Int): DeferredQueryBuilder =
     c"""
        MATCH (u1: User { userId: $currentUserId} )-[r:IS_FOLLOWING]->(u2: User)
-       RETURN u2"""
+       RETURN u2
+       SKIP $skip
+       LIMIT $limit"""
 
   private def CYPHER_MAKE_USER_UNFOLLOW_OTHER(requestingUserId: UUID, targetUserId: UUID): DeferredQueryBuilder =
     c"""
