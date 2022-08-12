@@ -56,13 +56,13 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
       .readOnlyQuery[PostComment]
       .list(db)
 
-  override def getNewsfeedPostsForCurrentUser(userId: UUID): Future[Seq[Post]] =
-    CYPHER_GET_USER_NEWSFEED_POSTS(userId)
+  override def getNewsfeedPostsForCurrentUser(userId: UUID, createdBefore: Long, limit: Int): Future[Seq[Post]] =
+    CYPHER_GET_USER_NEWSFEED_POSTS(userId, createdBefore, limit)
       .readOnlyQuery[Post]
       .list(db)
 
-  override def getPostsForUser(userId: UUID): Future[Seq[Post]] =
-    CYPHER_GET_USER_POSTS(userId)
+  override def getPostsForUser(userId: UUID, createdBefore: Long, limit: Int): Future[Seq[Post]] =
+    CYPHER_GET_USER_POSTS(userId, createdBefore, limit)
       .readOnlyQuery[Post]
       .list(db)
 
@@ -174,7 +174,7 @@ object NeoTypesSocialMediaRepository {
       RETURN postId, userId, text, photoUrl, numberOfLikes, numberOfComments, createdAt, updatedAt"""
   }
 
-  private def CYPHER_GET_USER_POSTS(userId: UUID): DeferredQueryBuilder =
+  private def CYPHER_GET_USER_POSTS(userId: UUID, createdBefore: Long, limit: Int): DeferredQueryBuilder =
     c"""
       MATCH (currentUser: User { userId: $userId })-[:POSTED]->(post: Post)
       WITH post
@@ -184,11 +184,23 @@ object NeoTypesSocialMediaRepository {
       WITH
         post.postId AS postId, post.userId AS userId, post.text AS text,
         numberOfLikes, count(c) AS numberOfComments,
-        post.photoUrl AS photoUrl, post.createdAt AS createdAt, post.updatedAt AS updatedAt
-      ORDER BY updatedAt DESC
-      RETURN postId, userId, text, numberOfLikes, numberOfComments, photoUrl, createdAt, updatedAt"""
+        post.photoUrl AS photoUrl, post.createdAt AS createdAt, post.updatedAt AS updatedAt,
+        datetime({
+            year: post.createdAt.year, month: post.createdAt.month, day: post.createdAt.day,
+            hour: post.createdAt.hour, minute: post.createdAt.minute, second: post.createdAt.second,
+            millisecond: post.createdAt.millisecond
+          }) AS postCreatedAt
+      
+      WHERE postCreatedAt.epochMillis < $createdBefore
+      RETURN postId, userId, text, numberOfLikes, numberOfComments, photoUrl, createdAt, updatedAt
+      ORDER BY createdAt DESC
+      LIMIT $limit"""
 
-  private def CYPHER_GET_USER_NEWSFEED_POSTS(currentUserId: UUID): DeferredQueryBuilder =
+  private def CYPHER_GET_USER_NEWSFEED_POSTS(
+    currentUserId: UUID,
+    createdBefore: Long,
+    limit: Int
+  ): DeferredQueryBuilder =
     c"""
       CALL {
         MATCH (current: User { userId: $currentUserId })-[:IS_FOLLOWING]->(friend: User)-[:POSTED]->(post: Post)
@@ -199,8 +211,13 @@ object NeoTypesSocialMediaRepository {
         WITH
           post.postId AS postId, post.userId AS userId, post.text AS text,
           numberOfLikes, count(c) AS numberOfComments,
-          post.photoUrl AS photoUrl, post.createdAt AS createdAt, post.updatedAt AS updatedAt
-        RETURN postId, userId, text, numberOfLikes, numberOfComments, photoUrl, createdAt, updatedAt
+          post.photoUrl AS photoUrl, post.createdAt AS createdAt, post.updatedAt AS updatedAt,
+          datetime({
+            year: post.createdAt.year, month: post.createdAt.month, day: post.createdAt.day,
+            hour: post.createdAt.hour, minute: post.createdAt.minute, second: post.createdAt.second,
+            millisecond: post.createdAt.millisecond
+          }) AS postCreatedAt
+        RETURN postId, userId, text, numberOfLikes, numberOfComments, photoUrl, createdAt, updatedAt, postCreatedAt
 
         UNION
 
@@ -212,11 +229,20 @@ object NeoTypesSocialMediaRepository {
         WITH
           post.postId AS postId, post.userId AS userId, post.text AS text,
           numberOfLikes, count(c) AS numberOfComments,
-          post.photoUrl AS photoUrl, post.createdAt AS createdAt, post.updatedAt AS updatedAt
-        RETURN postId, userId, text, numberOfLikes, numberOfComments, photoUrl, createdAt, updatedAt
+          post.photoUrl AS photoUrl, post.createdAt AS createdAt, post.updatedAt AS updatedAt,
+          datetime({
+            year: post.createdAt.year, month: post.createdAt.month, day: post.createdAt.day,
+            hour: post.createdAt.hour, minute: post.createdAt.minute, second: post.createdAt.second,
+            millisecond: post.createdAt.millisecond
+          }) AS postCreatedAt
+        RETURN postId, userId, text, numberOfLikes, numberOfComments, photoUrl, createdAt, updatedAt, postCreatedAt
       }
-
+      WITH postId as postId, userId as userId, text as text, numberOfLikes as numberOfLikes, 
+        numberOfComments as numberOfComments, photoUrl as photoUrl, createdAt as createdAt, 
+        updatedAt as updatedAt, postCreatedAt as postCreatedAt
+      WHERE postCreatedAt.epochMillis < $createdBefore
       RETURN postId, userId, text, numberOfLikes, numberOfComments, photoUrl, createdAt, updatedAt
-      ORDER BY updatedAt DESC"""
+      ORDER BY createdAt DESC
+      LIMIT $limit"""
 
 }

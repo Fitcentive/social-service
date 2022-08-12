@@ -9,6 +9,7 @@ import io.fitcentive.social.infrastructure.utils.ServerErrorHandler
 import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 
+import java.time.Instant
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
@@ -36,20 +37,31 @@ class SocialMediaController @Inject() (
       }
     }
 
-  def getPostsForUser(implicit userId: UUID): Action[AnyContent] =
+  def getPostsForUser(implicit userId: UUID, createdBefore: Option[Long] = None, limit: Int = 10): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
       socialMediaApi
-        .getPostsByUser(userId, userRequest.authorizedUser.userId)
+        .getPostsByUser(
+          userId,
+          userRequest.authorizedUser.userId,
+          createdBefore.fold(Instant.now.toEpochMilli)(identity),
+          limit
+        )
         .map(handleEitherResult(_)(posts => Ok(Json.toJson(posts))))
         .recover(resultErrorAsyncHandler)
     }
 
-  def getNewsfeedForUser(implicit userId: UUID): Action[AnyContent] =
+  def getNewsfeedForUser(implicit
+    userId: UUID,
+    createdBefore: Option[Long] = None,
+    limit: Int = 10
+  ): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
-      socialMediaApi
-        .getNewsfeedPostsForUser(userId)
-        .map(posts => Ok(Json.toJson(posts)))
-        .recover(resultErrorAsyncHandler)
+      rejectIfNotEntitled {
+        socialMediaApi
+          .getNewsfeedPostsForUser(userId, createdBefore.fold(Instant.now.toEpochMilli)(identity), limit)
+          .map(posts => Ok(Json.toJson(posts)))
+          .recover(resultErrorAsyncHandler)
+      }
     }
 
   def likePostForUser(implicit userId: UUID, postId: UUID): Action[AnyContent] =

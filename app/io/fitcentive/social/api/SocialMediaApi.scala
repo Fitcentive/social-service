@@ -7,6 +7,7 @@ import io.fitcentive.social.domain.{Post, PostComment, PublicUserProfile}
 import io.fitcentive.social.repositories.{SocialMediaRepository, UserRelationshipsRepository}
 import io.fitcentive.social.services.MessageBusService
 
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -21,7 +22,12 @@ class SocialMediaApi @Inject() (
   def createPostForUser(post: Post.Create): Future[Post] =
     socialMediaRepository.createUserPost(post)
 
-  def getPostsByUser(userId: UUID, requestingUserId: UUID): Future[Either[DomainError, Seq[Post]]] =
+  def getPostsByUser(
+    userId: UUID,
+    requestingUserId: UUID,
+    createdBefore: Long,
+    limit: Int
+  ): Future[Either[DomainError, Seq[Post]]] =
     (for {
       _ <- EitherT[Future, DomainError, Boolean] {
         if (requestingUserId == userId) Future.successful(Right(true))
@@ -30,14 +36,14 @@ class SocialMediaApi @Inject() (
             .getUserIfFollowingOtherUser(requestingUserId, userId)
             .map(_.map(_ => Right(true)).getOrElse(Left(EntityNotAccessible("User not following other user!"))))
       }
-      posts <- EitherT.right[DomainError](socialMediaRepository.getPostsForUser(userId))
+      posts <- EitherT.right[DomainError](socialMediaRepository.getPostsForUser(userId, createdBefore, limit))
     } yield posts).value
 
   /**
     * Returns posts belong to both current user as well posts of users being followed
     */
-  def getNewsfeedPostsForUser(userId: UUID): Future[Seq[Post]] =
-    socialMediaRepository.getNewsfeedPostsForCurrentUser(userId)
+  def getNewsfeedPostsForUser(userId: UUID, createdBefore: Long, limit: Int): Future[Seq[Post]] =
+    socialMediaRepository.getNewsfeedPostsForCurrentUser(userId, createdBefore, limit)
 
   def likePostForUser(postId: UUID, userId: UUID): Future[Either[DomainError, Unit]] =
     (for {
