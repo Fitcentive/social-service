@@ -3,21 +3,14 @@ package io.fitcentive.social.infrastructure.settings
 import io.fitcentive.social.domain.types.CustomTypes.GraphDb
 import io.fitcentive.social.infrastructure.contexts.Neo4jExecutionContext
 import io.fitcentive.social.services.HealthService
-import io.fitcentive.sdk.infrastructure.contexts.DatabaseExecutionContext
-import io.fitcentive.sdk.infrastructure.database.DatabaseClient
 import neotypes.DeferredQueryBuilder
 import neotypes.implicits.syntax.cypher._
-import play.api.db.Database
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
-class AppHealthService @Inject() (val graphDb: GraphDb, val db: Database)(implicit
-  val ec: Neo4jExecutionContext,
-  val dbec: DatabaseExecutionContext
-) extends HealthService
-  with DatabaseClient {
+class AppHealthService @Inject() (val graphDb: GraphDb)(implicit val ec: Neo4jExecutionContext) extends HealthService {
 
   import AppHealthService._
 
