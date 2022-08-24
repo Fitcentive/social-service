@@ -30,7 +30,7 @@ spec:
               containerPort: 9000
           readinessProbe:
             httpGet:
-              path: /api/social/health
+              path: /api/social/healthz
               port: 9000
             initialDelaySeconds: 60
             periodSeconds: 30

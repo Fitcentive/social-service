@@ -3,7 +3,8 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET     /api/social/health                                                                        io.fitcentive.social.controllers.HealthController.healthCheck
+GET     /api/social/healthz                                                                       io.fitcentive.social.controllers.HealthController.readinessProbe
+GET     /api/social/health                                                                        io.fitcentive.social.controllers.HealthController.livenessProbe
 
 # User relationships endpoints
 POST    /api/social/user/:currentUserId/unfollow/:targetUserId                                    io.fitcentive.social.controllers.UserRelationshipsController.unfollowUser(currentUserId: java.util.UUID, targetUserId: java.util.UUID)
