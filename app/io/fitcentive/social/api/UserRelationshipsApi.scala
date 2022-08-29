@@ -17,6 +17,15 @@ class UserRelationshipsApi @Inject() (
   messageBusService: MessageBusService,
 )(implicit ec: ExecutionContext) {
 
+  /**
+    * The following are captured implicitly by detach deleting user nodes
+    * 1. User liked posts
+    * 2. User following others
+    * 3. Other users following User
+    */
+  def deleteUser(userId: UUID): Future[Unit] =
+    userRelationshipsRepository.deleteUser(userId)
+
   def upsertUser(publicUser: PublicUserProfile): Future[PublicUserProfile] =
     userRelationshipsRepository.upsertUser(publicUser)
 

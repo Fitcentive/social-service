@@ -9,6 +9,7 @@ import scala.concurrent.Future
 
 @ImplementedBy(classOf[NeoTypesUserRelationshipsRepository])
 trait UserRelationshipsRepository {
+  def deleteUser(userId: UUID): Future[Unit]
   def upsertUser(user: PublicUserProfile): Future[PublicUserProfile]
   def getUserIfFollowingOtherUser(currentUser: UUID, otherUser: UUID): Future[Option[PublicUserProfile]]
   def getUserFollowers(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]]

@@ -36,6 +36,11 @@ class NeoTypesUserRelationshipsRepository @Inject() (val db: GraphDb)(implicit v
       .readOnlyQuery[Unit]
       .single(db)
 
+  override def deleteUser(userId: UUID): Future[Unit] =
+    CYPHER_DELETE_USER(userId)
+      .readOnlyQuery[Unit]
+      .single(db)
+
   override def upsertUser(user: PublicUserProfile): Future[PublicUserProfile] =
     CYPHER_UPSERT_USER_INFO(user)
       .readOnlyQuery[PublicNeo4jUserProfile]
@@ -87,6 +92,12 @@ object NeoTypesUserRelationshipsRepository {
         gender = gender,
       )
   }
+
+  private def CYPHER_DELETE_USER(userId: UUID): DeferredQueryBuilder =
+    c"""
+     OPTIONAL MATCH (user: User { userId: $userId })
+     DETACH DELETE user
+     """
 
   private def CYPHER_UPSERT_USER_INFO(user: PublicUserProfile): DeferredQueryBuilder =
     c"""

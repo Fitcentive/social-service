@@ -66,13 +66,52 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
       .readOnlyQuery[Post]
       .list(db)
 
+  override def getAllPostIdsForUser(userId: UUID): Future[Seq[String]] =
+    CYPHER_GET_USER_POST_IDS(userId)
+      .readOnlyQuery[String]
+      .list(db)
+
   override def createUserPost(post: Post.Create): Future[Post] =
     CYPHER_CREATE_USER_POST(post)
       .readOnlyQuery[Post]
       .single(db)
+
+  override def deleteAllCommentsForUser(userId: UUID): Future[Unit] =
+    CYPHER_DELETE_ALL_COMMENTS_FOR_USER(userId)
+      .readOnlyQuery[Unit]
+      .single(db)
+
+  override def deleteAllPostsForUser(userId: UUID): Future[Unit] =
+    CYPHER_DELETE_ALL_POSTS_FOR_USER(userId)
+      .readOnlyQuery[Unit]
+      .single(db)
+
+  override def deleteAllCommentsForPost(postId: UUID): Future[Unit] =
+    CYPHER_DELETE_ALL_COMMENTS_FOR_POST(postId)
+      .readOnlyQuery[Unit]
+      .single(db)
 }
 
 object NeoTypesSocialMediaRepository {
+
+  private def CYPHER_DELETE_ALL_COMMENTS_FOR_USER(userId: UUID): DeferredQueryBuilder =
+    c"""
+     OPTIONAL MATCH (c: Comment { userId: $userId })
+     DETACH DELETE c 
+     """
+
+  private def CYPHER_DELETE_ALL_COMMENTS_FOR_POST(postId: UUID): DeferredQueryBuilder =
+    c"""
+     OPTIONAL MATCH (p: Post { postId: $postId })-[:HAS_COMMENT]->(c: Comment)
+     DETACH DELETE c 
+     """
+
+  private def CYPHER_DELETE_ALL_POSTS_FOR_USER(userId: UUID): DeferredQueryBuilder =
+    c"""
+     OPTIONAL MATCH (p: Post { userId: $userId })
+     DETACH DELETE p
+     """
+
   private def CYPHER_GET_POST_BY_ID(postId: UUID): DeferredQueryBuilder =
     c"""
       OPTIONAL MATCH (post: Post { postId: $postId })
@@ -173,6 +212,12 @@ object NeoTypesSocialMediaRepository {
            post.createdAt AS createdAt, post.updatedAt AS updatedAt
       RETURN postId, userId, text, photoUrl, numberOfLikes, numberOfComments, createdAt, updatedAt"""
   }
+
+  private def CYPHER_GET_USER_POST_IDS(userId: UUID): DeferredQueryBuilder =
+    c"""
+     MATCH (currentUser: User { userId: $userId })-[:POSTED]->(post: Post)
+     RETURN post.postId
+     """
 
   private def CYPHER_GET_USER_POSTS(userId: UUID, createdBefore: Long, limit: Int): DeferredQueryBuilder =
     c"""

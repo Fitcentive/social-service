@@ -19,7 +19,8 @@ GET     /api/social/user/:currentUserId/follow-status/:targetUserId             
 
 # Internal routes
 POST    /api/internal/social/user                                                                 io.fitcentive.social.controllers.UserRelationshipsController.upsertUser
-
+DELETE  /api/internal/social/user/:userId/social-media                                            io.fitcentive.social.controllers.SocialMediaController.deleteUserSocialMediaContent(userId: java.util.UUID)
+DELETE  /api/internal/social/user/:userId                                                         io.fitcentive.social.controllers.UserRelationshipsController.deleteUser(userId: java.util.UUID)
 
 # Social media endpoints
 GET     /api/social/user/:userId/post                                                             io.fitcentive.social.controllers.SocialMediaController.getPostsForUser(userId: java.util.UUID, createdBefore: Option[Long] ?= None, limit: Int ?= 10)

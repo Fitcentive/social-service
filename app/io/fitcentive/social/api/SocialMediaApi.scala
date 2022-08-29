@@ -19,6 +19,25 @@ class SocialMediaApi @Inject() (
   messageBusService: MessageBusService,
 )(implicit ec: ExecutionContext) {
 
+  /**
+    * Deleting a user should delete the following
+    * 1. User created posts
+    * 2. User created comments
+    *
+    * The following are captured implicitly by detach deleting user nodes
+    * 1. User liked posts
+    * 2. User following others
+    * 3. Other users following User
+    */
+  def deleteUserSocialMediaPosts(userId: UUID): Future[Unit] =
+    for {
+      _ <- socialMediaRepository.deleteAllCommentsForUser(userId)
+      postIds <- socialMediaRepository.getAllPostIdsForUser(userId)
+      _ <-
+        Future.sequence(postIds.map(postId => socialMediaRepository.deleteAllCommentsForPost(UUID.fromString(postId))))
+      _ <- socialMediaRepository.deleteAllPostsForUser(userId)
+    } yield ()
+
   def createPostForUser(post: Post.Create): Future[Post] =
     socialMediaRepository.createUserPost(post)
 

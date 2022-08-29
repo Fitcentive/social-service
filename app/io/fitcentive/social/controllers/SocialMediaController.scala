@@ -128,4 +128,14 @@ class SocialMediaController @Inject() (
       }
     }
 
+  // ---------------------------------------------------------------------
+  // Internal auth routes
+  // ---------------------------------------------------------------------
+  def deleteUserSocialMediaContent(userId: UUID): Action[AnyContent] =
+    internalAuthAction.async { implicit request =>
+      socialMediaApi
+        .deleteUserSocialMediaPosts(userId)
+        .map(_ => NoContent)
+        .recover(resultErrorAsyncHandler)
+    }
 }

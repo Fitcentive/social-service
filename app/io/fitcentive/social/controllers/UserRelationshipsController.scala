@@ -110,4 +110,12 @@ class UserRelationshipsController @Inject() (
       }
     }
 
+  def deleteUser(userId: UUID): Action[AnyContent] =
+    internalAuthAction.async { implicit request =>
+      userRelationshipsApi
+        .deleteUser(userId)
+        .map(_ => NoContent)
+        .recover(resultErrorAsyncHandler)
+    }
+
 }
