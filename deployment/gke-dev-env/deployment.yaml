@@ -54,11 +54,11 @@ spec:
             - name: JWT_ISSUER
               value: "https://auth.fitcentive.xyz"
             - name: KEYCLOAK_SERVER_URL
-              value: "http://keycloak-service-http/auth"
+              value: "http://keycloak-service-http.keycloak/auth"
             - name: RUNTIME_ENVIRONMENT
               value: "gke-dev-env"
             - name: USER_SERVICE_HOST
-              value: "http://user-service"
+              value: "http://user-service.user"
             - name: USER_SERVICE_PORT
               value: "9000"
             - name: TOPIC_USER_FOLLOW_REQUESTED
