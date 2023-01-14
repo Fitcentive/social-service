@@ -1,6 +1,5 @@
 package io.fitcentive.social.infrastructure.settings
 
-import com.google.auth.Credentials
 import com.typesafe.config.Config
 import io.fitcentive.sdk.config.{GcpConfig, JwtConfig, SecretConfig, ServerConfig}
 import io.fitcentive.social.domain.config.{AppPubSubConfig, Neo4jConfig, SubscriptionsConfig, TopicsConfig}
@@ -10,7 +9,10 @@ import play.api.Configuration
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class AppConfigService @Inject() (config: Configuration, gcpCredentials: Credentials) extends SettingsService {
+class AppConfigService @Inject() (config: Configuration) extends SettingsService {
+
+  override def pubSubServiceAccountStringCredentials: String =
+    config.get[String]("gcp.pubsub.service-account-string-credentials")
 
   override def userServiceConfig: ServerConfig =
     ServerConfig.fromConfig(config.get[Config]("services.user-service"))
@@ -30,6 +32,6 @@ class AppConfigService @Inject() (config: Configuration, gcpCredentials: Credent
   override def jwtConfig: JwtConfig = JwtConfig.apply(config.get[Config]("jwt"))
 
   override def gcpConfig: GcpConfig =
-    GcpConfig(credentials = gcpCredentials, project = config.get[String]("gcp.project"))
+    GcpConfig(project = config.get[String]("gcp.project"))
 
 }

@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: social-service
+  namespace: social
+  labels:
+    app: social-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: social-service
+  template:
+    metadata:
+      labels:
+        app: social-service
+    spec:
+      containers:
+        - name: social-service
+          image: gcr.io/fitcentive-dev/social:1.0
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 300Mi
+              cpu: "0.3"
+            limits:
+              memory: 500Mi
+              cpu: "0.5"
+          ports:
+            - name: http-port
+              containerPort: 9000
+          readinessProbe:
+            httpGet:
+              path: /api/social/health
+              port: 9000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /api/social/health
+              port: 9000
+            initialDelaySeconds: 120
+            periodSeconds: 15
+          envFrom:
+            - secretRef:
+                name: internal-service-secret
+            - secretRef:
+                name: neo4j-secrets
+            - secretRef:
+                name: social-service-service-account-credentials
+          env:
+            - name: GCP_PROJECT_NAME
+              value: "fitcentive-dev"
+            - name: JWT_ISSUER
+              value: "https://auth.fitcentive.xyz"
+            - name: KEYCLOAK_SERVER_URL
+              value: "http://keycloak-service-http/auth"
+            - name: RUNTIME_ENVIRONMENT
+              value: "gke-dev-env"
+            - name: USER_SERVICE_HOST
+              value: "http://user-service"
+            - name: USER_SERVICE_PORT
+              value: "9000"
+            - name: TOPIC_USER_FOLLOW_REQUESTED
+              value: "user-follow-requested"
+            - name: TOPIC_USER_FOLLOW_REQUEST_DECISION
+              value: "user-follow-request-decision"
+            - name: TOPIC_USER_COMMENTED_ON_POST
+              value: "user-commented-on-post"
+            - name: TOPIC_USER_LIKED_POST
+              value: "user-liked-post"
+

@@ -7,6 +7,7 @@ import io.fitcentive.social.infrastructure.settings.AppConfigService
 
 @ImplementedBy(classOf[AppConfigService])
 trait SettingsService {
+  def pubSubServiceAccountStringCredentials: String
   def pubSubConfig: AppPubSubConfig
   def gcpConfig: GcpConfig
   def jwtConfig: JwtConfig
