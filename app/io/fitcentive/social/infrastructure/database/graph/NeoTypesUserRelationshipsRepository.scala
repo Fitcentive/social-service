@@ -38,12 +38,12 @@ class NeoTypesUserRelationshipsRepository @Inject() (val db: GraphDb)(implicit v
 
   override def deleteUser(userId: UUID): Future[Unit] =
     CYPHER_DELETE_USER(userId)
-      .readOnlyQuery[Unit]
+      .query[Unit]
       .single(db)
 
   override def upsertUser(user: PublicUserProfile): Future[PublicUserProfile] =
     CYPHER_UPSERT_USER_INFO(user)
-      .readOnlyQuery[PublicNeo4jUserProfile]
+      .query[PublicNeo4jUserProfile]
       .single(db)
       .map(_.toPublicUserProfile)
 
