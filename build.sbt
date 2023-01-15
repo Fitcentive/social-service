@@ -2,7 +2,7 @@ name := "social"
 
 version := "1.0"
 
-lazy val `notification` = (project in file("."))
+lazy val `social` = (project in file("."))
   .enablePlugins(PlayScala)
   .disablePlugins(PlayLogback)
 
@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
   //Logging
   "ch.qos.logback"       % "logback-classic"          % "1.3.0-alpha10",
   "net.logstash.logback" % "logstash-logback-encoder" % "7.0.1",
-  specs2                   % Test,
+  specs2                 % Test,
   guice
 )
 
