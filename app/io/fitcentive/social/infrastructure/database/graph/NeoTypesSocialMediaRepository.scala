@@ -32,12 +32,12 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
 
   override def makeUserLikePost(userId: UUID, postId: UUID): Future[Unit] =
     CYPHER_MAKE_USER_LIKE_POST(userId, postId)
-      .readOnlyQuery[Unit]
+      .query[Unit]
       .single(db)
 
   override def makeUserUnlikePost(userId: UUID, postId: UUID): Future[Unit] =
     CYPHER_MAKE_USER_UNLIKE_POST(userId, postId)
-      .readOnlyQuery[Unit]
+      .query[Unit]
       .single(db)
 
   override def getUsersWhoLikedPost(postId: UUID): Future[Seq[PublicUserProfile]] =
@@ -48,7 +48,7 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
 
   override def addCommentToPost(comment: PostComment.Create): Future[PostComment] =
     CYPHER_ADD_COMMENT_TO_POST(comment)
-      .readOnlyQuery[PostComment]
+      .query[PostComment]
       .single(db)
 
   override def getCommentsForPost(postId: UUID): Future[Seq[PostComment]] =
@@ -73,22 +73,22 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
 
   override def createUserPost(post: Post.Create): Future[Post] =
     CYPHER_CREATE_USER_POST(post)
-      .readOnlyQuery[Post]
+      .query[Post]
       .single(db)
 
   override def deleteAllCommentsForUser(userId: UUID): Future[Unit] =
     CYPHER_DELETE_ALL_COMMENTS_FOR_USER(userId)
-      .readOnlyQuery[Unit]
+      .query[Unit]
       .single(db)
 
   override def deleteAllPostsForUser(userId: UUID): Future[Unit] =
     CYPHER_DELETE_ALL_POSTS_FOR_USER(userId)
-      .readOnlyQuery[Unit]
+      .query[Unit]
       .single(db)
 
   override def deleteAllCommentsForPost(postId: UUID): Future[Unit] =
     CYPHER_DELETE_ALL_COMMENTS_FOR_POST(postId)
-      .readOnlyQuery[Unit]
+      .query[Unit]
       .single(db)
 }
 
