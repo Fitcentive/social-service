@@ -23,12 +23,12 @@ class NeoTypesUserRelationshipsRepository @Inject() (val db: GraphDb)(implicit v
 
   override def makeUserUnfriendOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit] =
     CYPHER_MAKE_USER_UNFRIEND_OTHER(requestingUserId, targetUserId)
-      .readOnlyQuery[Unit]
+      .query[Unit]
       .single(db)
 
   override def makeUserFriendsWithOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit] =
     CYPHER_MAKE_USER_FRIENDS_WITH_OTHER(requestingUserId, targetUserId)
-      .readOnlyQuery[Unit]
+      .query[Unit]
       .single(db)
 
   override def deleteUser(userId: UUID): Future[Unit] =

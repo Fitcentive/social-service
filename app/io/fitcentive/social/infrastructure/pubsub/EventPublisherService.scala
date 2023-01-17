@@ -1,8 +1,8 @@
 package io.fitcentive.social.infrastructure.pubsub
 
-import io.fitcentive.registry.events.push.UserFollowRequested
+import io.fitcentive.registry.events.push.UserFriendRequested
 import io.fitcentive.registry.events.social.{UserCommentedOnPost, UserLikedPost}
-import io.fitcentive.registry.events.user.UserFollowRequestDecision
+import io.fitcentive.registry.events.user.UserFriendRequestDecision
 import io.fitcentive.sdk.gcp.pubsub.PubSubPublisher
 import io.fitcentive.social.domain.config.TopicsConfig
 import io.fitcentive.social.infrastructure.contexts.PubSubExecutionContext
@@ -34,11 +34,11 @@ class EventPublisherService @Inject() (publisher: PubSubPublisher, settingsServi
       .pipe(publisher.publish(publisherConfig.userLikedPostTopic, _))
 
   override def publishUserFriendRequestDecision(targetUser: UUID, isApproved: Boolean): Future[Unit] =
-    UserFollowRequestDecision(targetUser, isApproved)
-      .pipe(publisher.publish(publisherConfig.userFollowRequestDecisionTopic, _))
+    UserFriendRequestDecision(targetUser, isApproved)
+      .pipe(publisher.publish(publisherConfig.userFriendRequestDecisionTopic, _))
 
   override def publishUserFriendRequestNotification(requestingUser: UUID, targetUser: UUID): Future[Unit] =
-    UserFollowRequested(requestingUser, targetUser)
-      .pipe(publisher.publish(publisherConfig.userFollowRequestedTopic, _))
+    UserFriendRequested(requestingUser, targetUser)
+      .pipe(publisher.publish(publisherConfig.userFriendRequestedTopic, _))
 
 }

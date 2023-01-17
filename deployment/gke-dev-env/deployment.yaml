@@ -61,10 +61,10 @@ spec:
               value: "http://user-service.user"
             - name: USER_SERVICE_PORT
               value: "9000"
-            - name: TOPIC_USER_FOLLOW_REQUESTED
-              value: "user-follow-requested"
-            - name: TOPIC_USER_FOLLOW_REQUEST_DECISION
-              value: "user-follow-request-decision"
+            - name: TOPIC_USER_FRIEND_REQUESTED
+              value: "user-friend-requested"
+            - name: TOPIC_USER_FRIEND_REQUEST_DECISION
+              value: "user-friend-request-decision"
             - name: TOPIC_USER_COMMENTED_ON_POST
               value: "user-commented-on-post"
             - name: TOPIC_USER_LIKED_POST
