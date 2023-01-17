@@ -8,8 +8,8 @@ import scala.concurrent.Future
 
 @ImplementedBy(classOf[EventPublisherService])
 trait MessageBusService {
-  def publishUserFollowRequestNotification(requestingUser: UUID, targetUser: UUID): Future[Unit]
-  def publishUserFollowRequestDecision(targetUser: UUID, isApproved: Boolean): Future[Unit]
+  def publishUserFriendRequestNotification(requestingUser: UUID, targetUser: UUID): Future[Unit]
+  def publishUserFriendRequestDecision(targetUser: UUID, isApproved: Boolean): Future[Unit]
   def publishUserCommentedOnPostNotification(
     commentingUser: UUID,
     targetUser: UUID,

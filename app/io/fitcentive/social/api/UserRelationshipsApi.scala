@@ -29,14 +29,14 @@ class UserRelationshipsApi @Inject() (
   def upsertUser(publicUser: PublicUserProfile): Future[PublicUserProfile] =
     userRelationshipsRepository.upsertUser(publicUser)
 
-  def requestToFollowUser(currentUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]] =
+  def requestToFriendUser(currentUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]] =
     (for {
-      _ <- EitherT[Future, DomainError, Unit](userService.requestToFollowUser(currentUserId, targetUserId))
+      _ <- EitherT[Future, DomainError, Unit](userService.requestToFriendUser(currentUserId, targetUserId))
       _ <-
-        EitherT.right[DomainError](messageBusService.publishUserFollowRequestNotification(currentUserId, targetUserId))
+        EitherT.right[DomainError](messageBusService.publishUserFriendRequestNotification(currentUserId, targetUserId))
     } yield ()).value
 
-  def applyUserFollowRequestDecision(
+  def applyUserFriendRequestDecision(
     targetUserId: UUID,
     requestingUserId: UUID,
     isRequestApproved: Boolean
@@ -44,55 +44,44 @@ class UserRelationshipsApi @Inject() (
     (for {
       _ <- EitherT[Future, DomainError, UserFollowRequest](
         userService
-          .getUserFollowRequest(requestingUserId, targetUserId)
+          .getUserFriendRequest(requestingUserId, targetUserId)
           .map(_.map(Right.apply).getOrElse(Left(EntityNotFoundError("User follow request not found!"))))
       )
-      _ <- EitherT[Future, DomainError, Unit](userService.deleteUserFollowRequest(requestingUserId, targetUserId))
+      _ <- EitherT[Future, DomainError, Unit](userService.deleteUserFriendRequest(requestingUserId, targetUserId))
       _ <- EitherT.right[DomainError] {
-        if (isRequestApproved) userRelationshipsRepository.makeUserFollowOther(requestingUserId, targetUserId)
+        if (isRequestApproved) userRelationshipsRepository.makeUserFriendsWithOther(requestingUserId, targetUserId)
         else Future.unit
       }
       _ <-
-        EitherT.right[DomainError](messageBusService.publishUserFollowRequestDecision(targetUserId, isRequestApproved))
+        EitherT.right[DomainError](messageBusService.publishUserFriendRequestDecision(targetUserId, isRequestApproved))
     } yield ()).value
 
-  def removeFollowerForUser(currentUserId: UUID, followingUserId: UUID): Future[Unit] =
-    userRelationshipsRepository.removeFollowerForUser(currentUserId, followingUserId)
+  def unfriendUser(currentUserId: UUID, targetUserId: UUID): Future[Unit] =
+    userRelationshipsRepository.makeUserUnfriendOther(currentUserId, targetUserId)
 
-  def unfollowUser(currentUserId: UUID, targetUserId: UUID): Future[Unit] =
-    userRelationshipsRepository.makeUserUnFollowOther(currentUserId, targetUserId)
+  def getUserFriends(currentUserId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
+    userRelationshipsRepository.getUserFriends(currentUserId, skip, limit)
 
-  def getUserFollowers(currentUserId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
-    userRelationshipsRepository.getUserFollowers(currentUserId, skip, limit)
-
-  def getUserFollowing(currentUserId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
-    userRelationshipsRepository.getUserFollowing(currentUserId, skip, limit)
-
-  def getUserFollowStatus(currentUserId: UUID, otherUserId: UUID): Future[UserFollowStatus] =
+  def getUserFriendStatus(currentUserId: UUID, otherUserId: UUID): Future[UserFollowStatus] =
     for {
-      isCurrentUserFollowingOtherUser <-
+      isCurrentUserFriendsWithOtherUser <-
         userRelationshipsRepository
-          .getUserIfFollowingOtherUser(currentUserId, otherUserId)
+          .getUserIfFriendsWithOtherUser(currentUserId, otherUserId)
           .map(_.isDefined)
-      isOtherUserFollowingCurrentUser <-
-        userRelationshipsRepository
-          .getUserIfFollowingOtherUser(otherUserId, currentUserId)
-          .map(_.isDefined)
-      hasCurrentUserRequestedToFollowOtherUser <-
+      hasCurrentUserRequestedToFriendOtherUser <-
         userService
-          .getUserFollowRequest(currentUserId, otherUserId)
+          .getUserFriendRequest(currentUserId, otherUserId)
           .map(_.isDefined)
-      hasOtherUserRequestedToFollowCurrentUser <-
+      hasOtherUserRequestedToFriendCurrentUser <-
         userService
-          .getUserFollowRequest(otherUserId, currentUserId)
+          .getUserFriendRequest(otherUserId, currentUserId)
           .map(_.isDefined)
     } yield UserFollowStatus(
       currentUserId,
       otherUserId,
-      isCurrentUserFollowingOtherUser,
-      isOtherUserFollowingCurrentUser,
-      hasCurrentUserRequestedToFollowOtherUser,
-      hasOtherUserRequestedToFollowCurrentUser
+      isCurrentUserFriendsWithOtherUser,
+      hasCurrentUserRequestedToFriendOtherUser,
+      hasOtherUserRequestedToFriendCurrentUser
     )
 
 }

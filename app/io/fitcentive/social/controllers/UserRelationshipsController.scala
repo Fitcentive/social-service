@@ -24,73 +24,53 @@ class UserRelationshipsController @Inject() (
   with PlayControllerOps
   with ServerErrorHandler {
 
-  def unfollowUser(currentUserId: UUID, targetUserId: UUID): Action[AnyContent] =
+  def unfriendUser(currentUserId: UUID, targetUserId: UUID): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
       rejectIfNotEntitled {
         userRelationshipsApi
-          .unfollowUser(currentUserId, targetUserId)
+          .unfriendUser(currentUserId, targetUserId)
           .map(_ => Ok)
           .recover(resultErrorAsyncHandler)
       }(userRequest, currentUserId)
     }
 
-  def removeFollower(currentUserId: UUID, followingUserId: UUID): Action[AnyContent] =
-    userAuthAction.async { implicit userRequest =>
-      rejectIfNotEntitled {
-        userRelationshipsApi
-          .removeFollowerForUser(currentUserId, followingUserId)
-          .map(_ => Ok)
-          .recover(resultErrorAsyncHandler)
-      }(userRequest, currentUserId)
-    }
-
-  def getUserFollowers(implicit userId: UUID, skip: Int = 0, limit: Int = 50): Action[AnyContent] =
+  def getUserFriends(implicit userId: UUID, skip: Int = 0, limit: Int = 50): Action[AnyContent] =
     userAuthAction.async { implicit request =>
       rejectIfNotEntitled {
         userRelationshipsApi
-          .getUserFollowers(userId, skip, limit)
+          .getUserFriends(userId, skip, limit)
           .map(users => Ok(Json.toJson(users)))
           .recover(resultErrorAsyncHandler)
       }
     }
 
-  def getUserFollowing(implicit userId: UUID, skip: Int = 0, limit: Int = 50): Action[AnyContent] =
-    userAuthAction.async { implicit request =>
-      rejectIfNotEntitled {
-        userRelationshipsApi
-          .getUserFollowing(userId, skip, limit)
-          .map(users => Ok(Json.toJson(users)))
-          .recover(resultErrorAsyncHandler)
-      }
-    }
-
-  def requestToFollowUser(currentUserId: UUID, targetUserId: UUID): Action[AnyContent] =
+  def requestToFriendUser(currentUserId: UUID, targetUserId: UUID): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
       rejectIfNotEntitled {
         userRelationshipsApi
-          .requestToFollowUser(currentUserId, targetUserId)
+          .requestToFriendUser(currentUserId, targetUserId)
           .map(handleEitherResult(_)(_ => Accepted))
           .recover(resultErrorAsyncHandler)
       }(userRequest, currentUserId)
     }
 
-  def applyUserFollowRequestDecision(targetUserId: UUID, requestingUserId: UUID): Action[AnyContent] =
+  def applyUserFriendRequestDecision(targetUserId: UUID, requestingUserId: UUID): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
       rejectIfNotEntitled {
         validateJson[UserFollowRequestDecisionPayload](userRequest.request.body.asJson) { decision =>
           userRelationshipsApi
-            .applyUserFollowRequestDecision(targetUserId, requestingUserId, decision.isRequestApproved)
+            .applyUserFriendRequestDecision(targetUserId, requestingUserId, decision.isRequestApproved)
             .map(handleEitherResult(_)(_ => Ok))
             .recover(resultErrorAsyncHandler)
         }
       }(userRequest, targetUserId)
     }
 
-  def getUserFollowStatus(implicit currentUserId: UUID, targetUserId: UUID): Action[AnyContent] =
+  def getUserFriendStatus(implicit currentUserId: UUID, targetUserId: UUID): Action[AnyContent] =
     userAuthAction.async { implicit request =>
       rejectIfNotEntitled {
         userRelationshipsApi
-          .getUserFollowStatus(currentUserId, targetUserId)
+          .getUserFriendStatus(currentUserId, targetUserId)
           .map(users => Ok(Json.toJson(users)))
           .recover(resultErrorAsyncHandler)
       }(request, currentUserId)

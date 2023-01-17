@@ -21,9 +21,9 @@ class RestUserService @Inject() (wsClient: WSClient, settingsService: SettingsSe
   val userServiceConfig: ServerConfig = settingsService.userServiceConfig
   val baseUrl: String = userServiceConfig.serverUrl
 
-  override def requestToFollowUser(currentUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]] =
+  override def requestToFriendUser(currentUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]] =
     wsClient
-      .url(s"$baseUrl/api/internal/user/$currentUserId/follow-request/$targetUserId")
+      .url(s"$baseUrl/api/internal/user/$currentUserId/friend-request/$targetUserId")
       .addHttpHeaders("Content-Type" -> "application/json")
       .addServiceSecret(settingsService)
       .post(EmptyBody)
@@ -34,9 +34,9 @@ class RestUserService @Inject() (wsClient: WSClient, settingsService: SettingsSe
         }
       }
 
-  override def getUserFollowRequest(requestingUserId: UUID, targetUserId: UUID): Future[Option[UserFollowRequest]] =
+  override def getUserFriendRequest(requestingUserId: UUID, targetUserId: UUID): Future[Option[UserFollowRequest]] =
     wsClient
-      .url(s"$baseUrl/api/internal/user/$requestingUserId/follow-request/$targetUserId")
+      .url(s"$baseUrl/api/internal/user/$requestingUserId/friend-request/$targetUserId")
       .addHttpHeaders("Content-Type" -> "application/json")
       .addServiceSecret(settingsService)
       .get()
@@ -47,9 +47,9 @@ class RestUserService @Inject() (wsClient: WSClient, settingsService: SettingsSe
         }
       }
 
-  override def deleteUserFollowRequest(requestingUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]] =
+  override def deleteUserFriendRequest(requestingUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]] =
     wsClient
-      .url(s"$baseUrl/api/internal/user/$requestingUserId/follow-request/$targetUserId")
+      .url(s"$baseUrl/api/internal/user/$requestingUserId/friend-request/$targetUserId")
       .addHttpHeaders("Content-Type" -> "application/json")
       .addServiceSecret(settingsService)
       .delete()

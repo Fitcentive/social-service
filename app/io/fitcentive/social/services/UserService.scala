@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 @ImplementedBy(classOf[RestUserService])
 trait UserService {
-  def getUserFollowRequest(requestingUserId: UUID, targetUserId: UUID): Future[Option[UserFollowRequest]]
-  def deleteUserFollowRequest(requestingUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]]
-  def requestToFollowUser(currentUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]]
+  def getUserFriendRequest(requestingUserId: UUID, targetUserId: UUID): Future[Option[UserFollowRequest]]
+  def deleteUserFriendRequest(requestingUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]]
+  def requestToFriendUser(currentUserId: UUID, targetUserId: UUID): Future[Either[DomainError, Unit]]
 }

@@ -248,7 +248,7 @@ object NeoTypesSocialMediaRepository {
   ): DeferredQueryBuilder =
     c"""
       CALL {
-        MATCH (current: User { userId: $currentUserId })-[:IS_FOLLOWING]->(friend: User)-[:POSTED]->(post: Post)
+        MATCH (current: User { userId: $currentUserId })-[:IS_FRIENDS_WITH]-(friend: User)-[:POSTED]->(post: Post)
         WITH post
         OPTIONAL MATCH (u: User)-[rel:LIKED]->(post)
         WITH post, count(rel) AS numberOfLikes

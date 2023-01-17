@@ -33,11 +33,11 @@ class EventPublisherService @Inject() (publisher: PubSubPublisher, settingsServi
     UserLikedPost(likingUser, targetUser, postId)
       .pipe(publisher.publish(publisherConfig.userLikedPostTopic, _))
 
-  override def publishUserFollowRequestDecision(targetUser: UUID, isApproved: Boolean): Future[Unit] =
+  override def publishUserFriendRequestDecision(targetUser: UUID, isApproved: Boolean): Future[Unit] =
     UserFollowRequestDecision(targetUser, isApproved)
       .pipe(publisher.publish(publisherConfig.userFollowRequestDecisionTopic, _))
 
-  override def publishUserFollowRequestNotification(requestingUser: UUID, targetUser: UUID): Future[Unit] =
+  override def publishUserFriendRequestNotification(requestingUser: UUID, targetUser: UUID): Future[Unit] =
     UserFollowRequested(requestingUser, targetUser)
       .pipe(publisher.publish(publisherConfig.userFollowRequestedTopic, _))
 

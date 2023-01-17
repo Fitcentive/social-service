@@ -21,18 +21,13 @@ class NeoTypesUserRelationshipsRepository @Inject() (val db: GraphDb)(implicit v
 
   import NeoTypesUserRelationshipsRepository._
 
-  override def removeFollowerForUser(requestingUserId: UUID, targetUserId: UUID): Future[Unit] =
-    CYPHER_REMOVE_FOLLOWER_FOR_USER(requestingUserId, targetUserId)
+  override def makeUserUnfriendOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit] =
+    CYPHER_MAKE_USER_UNFRIEND_OTHER(requestingUserId, targetUserId)
       .readOnlyQuery[Unit]
       .single(db)
 
-  override def makeUserUnFollowOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit] =
-    CYPHER_MAKE_USER_UNFOLLOW_OTHER(requestingUserId, targetUserId)
-      .readOnlyQuery[Unit]
-      .single(db)
-
-  override def makeUserFollowOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit] =
-    CYPHER_MAKE_USER_FOLLOW_OTHER(requestingUserId, targetUserId)
+  override def makeUserFriendsWithOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit] =
+    CYPHER_MAKE_USER_FRIENDS_WITH_OTHER(requestingUserId, targetUserId)
       .readOnlyQuery[Unit]
       .single(db)
 
@@ -47,20 +42,14 @@ class NeoTypesUserRelationshipsRepository @Inject() (val db: GraphDb)(implicit v
       .single(db)
       .map(_.toPublicUserProfile)
 
-  override def getUserFollowers(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
-    CYPHER_GET_USER_FOLLOWERS(userId, skip, limit)
+  override def getUserFriends(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
+    CYPHER_GET_USER_FRIENDS(userId, skip, limit)
       .readOnlyQuery[PublicNeo4jUserProfile]
       .list(db)
       .map(_.map(_.toPublicUserProfile))
 
-  override def getUserFollowing(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
-    CYPHER_GET_USER_FOLLOWING(userId, skip, limit)
-      .readOnlyQuery[PublicNeo4jUserProfile]
-      .list(db)
-      .map(_.map(_.toPublicUserProfile))
-
-  override def getUserIfFollowingOtherUser(currentUser: UUID, otherUser: UUID): Future[Option[PublicUserProfile]] =
-    CYPHER_GET_USER_IF_FOLLOWING_OTHER_USER(currentUser, otherUser)
+  override def getUserIfFriendsWithOtherUser(currentUser: UUID, otherUser: UUID): Future[Option[PublicUserProfile]] =
+    CYPHER_GET_USER_IF_FRIENDS_WITH_OTHER_USER(currentUser, otherUser)
       .readOnlyQuery[Option[PublicNeo4jUserProfile]]
       .single(db)
       .map(_.map(_.toPublicUserProfile))
@@ -114,40 +103,28 @@ object NeoTypesUserRelationshipsRepository {
 
       RETURN user"""
 
-  private def CYPHER_MAKE_USER_FOLLOW_OTHER(requestingUserId: UUID, targetUserId: UUID): DeferredQueryBuilder =
+  private def CYPHER_MAKE_USER_FRIENDS_WITH_OTHER(requestingUserId: UUID, targetUserId: UUID): DeferredQueryBuilder =
     c"""
        MATCH (u1: User { userId: $requestingUserId } )
        MATCH (u2: User { userId: $targetUserId })
-       MERGE (u1)-[r:IS_FOLLOWING]->(u2)
+       MERGE (u1)-[r:IS_FRIENDS_WITH]-(u2)
        RETURN u2"""
 
-  private def CYPHER_GET_USER_FOLLOWERS(currentUserId: UUID, skip: Int, limit: Int): DeferredQueryBuilder =
+  private def CYPHER_GET_USER_FRIENDS(currentUserId: UUID, skip: Int, limit: Int): DeferredQueryBuilder =
     c"""
-       MATCH (u1: User)-[r:IS_FOLLOWING]->(u2: User { userId: $currentUserId})
+       MATCH (u1: User)-[r:IS_FRIENDS_WITH]-(u2: User { userId: $currentUserId})
        RETURN u1
        SKIP $skip
        LIMIT $limit"""
 
-  private def CYPHER_GET_USER_FOLLOWING(currentUserId: UUID, skip: Int, limit: Int): DeferredQueryBuilder =
+  private def CYPHER_MAKE_USER_UNFRIEND_OTHER(requestingUserId: UUID, targetUserId: UUID): DeferredQueryBuilder =
     c"""
-       MATCH (u1: User { userId: $currentUserId} )-[r:IS_FOLLOWING]->(u2: User)
-       RETURN u2
-       SKIP $skip
-       LIMIT $limit"""
-
-  private def CYPHER_MAKE_USER_UNFOLLOW_OTHER(requestingUserId: UUID, targetUserId: UUID): DeferredQueryBuilder =
-    c"""
-       MATCH (u1: User { userId: $requestingUserId })-[r:IS_FOLLOWING]->(u2: User { userId: $targetUserId })
+       MATCH (u1: User { userId: $requestingUserId })-[r:IS_FRIENDS_WITH]-(u2: User { userId: $targetUserId })
        DELETE r"""
 
-  private def CYPHER_REMOVE_FOLLOWER_FOR_USER(currentUserId: UUID, followingUserId: UUID): DeferredQueryBuilder =
+  private def CYPHER_GET_USER_IF_FRIENDS_WITH_OTHER_USER(currentUserId: UUID, otherUserId: UUID): DeferredQueryBuilder =
     c"""
-       MATCH (u1: User { userId: $followingUserId })-[r:IS_FOLLOWING]->(u2: User { userId: $currentUserId })
-       DELETE r"""
-
-  private def CYPHER_GET_USER_IF_FOLLOWING_OTHER_USER(currentUserId: UUID, otherUserId: UUID): DeferredQueryBuilder =
-    c"""
-       OPTIONAL MATCH (u1: User { userId: $currentUserId })-[r:IS_FOLLOWING]->(u2: User { userId: $otherUserId })
+       OPTIONAL MATCH (u1: User { userId: $currentUserId })-[r:IS_FRIENDS_WITH]-(u2: User { userId: $otherUserId })
        RETURN u1"""
 
 }

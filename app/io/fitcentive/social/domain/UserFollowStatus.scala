@@ -7,10 +7,9 @@ import java.util.UUID
 case class UserFollowStatus(
   currentUserId: UUID,
   otherUserId: UUID,
-  isCurrentUserFollowingOtherUser: Boolean,
-  isOtherUserFollowingCurrentUser: Boolean,
-  hasCurrentUserRequestedToFollowOtherUser: Boolean,
-  hasOtherUserRequestedToFollowCurrentUser: Boolean,
+  isCurrentUserFriendsWithOtherUser: Boolean,
+  hasCurrentUserRequestedToFriendOtherUser: Boolean,
+  hasOtherUserRequestedToFriendCurrentUser: Boolean,
 )
 
 object UserFollowStatus {

@@ -11,10 +11,8 @@ import scala.concurrent.Future
 trait UserRelationshipsRepository {
   def deleteUser(userId: UUID): Future[Unit]
   def upsertUser(user: PublicUserProfile): Future[PublicUserProfile]
-  def getUserIfFollowingOtherUser(currentUser: UUID, otherUser: UUID): Future[Option[PublicUserProfile]]
-  def getUserFollowers(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]]
-  def getUserFollowing(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]]
-  def makeUserFollowOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit]
-  def makeUserUnFollowOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit]
-  def removeFollowerForUser(currentUser: UUID, followingUser: UUID): Future[Unit]
+  def getUserIfFriendsWithOtherUser(currentUser: UUID, otherUser: UUID): Future[Option[PublicUserProfile]]
+  def getUserFriends(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]]
+  def makeUserFriendsWithOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit]
+  def makeUserUnfriendOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit]
 }

@@ -52,7 +52,7 @@ class SocialMediaApi @Inject() (
         if (requestingUserId == userId) Future.successful(Right(true))
         else
           userRelationshipsRepository
-            .getUserIfFollowingOtherUser(requestingUserId, userId)
+            .getUserIfFriendsWithOtherUser(requestingUserId, userId)
             .map(_.map(_ => Right(true)).getOrElse(Left(EntityNotAccessible("User not following other user!"))))
       }
       posts <- EitherT.right[DomainError](socialMediaRepository.getPostsForUser(userId, createdBefore, limit))
