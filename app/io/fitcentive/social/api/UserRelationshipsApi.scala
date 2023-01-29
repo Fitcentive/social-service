@@ -62,6 +62,9 @@ class UserRelationshipsApi @Inject() (
   def getUserFriends(currentUserId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
     userRelationshipsRepository.getUserFriends(currentUserId, skip, limit)
 
+  def searchUserFriends(currentUserId: UUID, query: String, skip: Int, limit: Int): Future[Seq[PublicUserProfile]] =
+    userRelationshipsRepository.searchUserFriends(currentUserId, query, skip, limit)
+
   def getUserFriendStatus(currentUserId: UUID, otherUserId: UUID): Future[UserFollowStatus] =
     for {
       isCurrentUserFriendsWithOtherUser <-

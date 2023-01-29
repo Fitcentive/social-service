@@ -48,6 +48,17 @@ class NeoTypesUserRelationshipsRepository @Inject() (val db: GraphDb)(implicit v
       .list(db)
       .map(_.map(_.toPublicUserProfile))
 
+  override def searchUserFriends(
+    userId: UUID,
+    searchQuery: String,
+    skip: Int,
+    limit: Int
+  ): Future[Seq[PublicUserProfile]] =
+    CYPHER_SEARCH_USER_FRIENDS(userId, searchQuery, skip, limit)
+      .readOnlyQuery[PublicNeo4jUserProfile]
+      .list(db)
+      .map(_.map(_.toPublicUserProfile))
+
   override def getUserIfFriendsWithOtherUser(currentUser: UUID, otherUser: UUID): Future[Option[PublicUserProfile]] =
     CYPHER_GET_USER_IF_FRIENDS_WITH_OTHER_USER(currentUser, otherUser)
       .readOnlyQuery[Option[PublicNeo4jUserProfile]]
@@ -113,6 +124,21 @@ object NeoTypesUserRelationshipsRepository {
   private def CYPHER_GET_USER_FRIENDS(currentUserId: UUID, skip: Int, limit: Int): DeferredQueryBuilder =
     c"""
        MATCH (u1: User)-[r:IS_FRIENDS_WITH]-(u2: User { userId: $currentUserId})
+       RETURN u1
+       SKIP $skip
+       LIMIT $limit"""
+
+  private def CYPHER_SEARCH_USER_FRIENDS(
+    currentUserId: UUID,
+    searchQuery: String,
+    skip: Int,
+    limit: Int
+  ): DeferredQueryBuilder =
+    c"""
+       MATCH (u1: User)-[r:IS_FRIENDS_WITH]-(u2: User { userId: $currentUserId})
+       WHERE (u1.firstName CONTAINS $searchQuery 
+       OR u1.lastName CONTAINS $searchQuery
+       OR u1.username CONTAINS $searchQuery)
        RETURN u1
        SKIP $skip
        LIMIT $limit"""

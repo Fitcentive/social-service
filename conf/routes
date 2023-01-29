@@ -9,6 +9,7 @@ GET     /api/social/health                                                      
 # User relationships endpoints
 POST    /api/social/user/:currentUserId/unfriend/:targetUserId                                    io.fitcentive.social.controllers.UserRelationshipsController.unfriendUser(currentUserId: java.util.UUID, targetUserId: java.util.UUID)
 GET     /api/social/user/:userId/friends                                                          io.fitcentive.social.controllers.UserRelationshipsController.getUserFriends(userId: java.util.UUID, skip: Int ?= 0, limit: Int ?= 50)
+GET     /api/social/user/:userId/search-friends                                                   io.fitcentive.social.controllers.UserRelationshipsController.searchUserFriends(userId: java.util.UUID, query: String, skip: Int ?= 0, limit: Int ?= 50)
 
 POST    /api/social/user/:currentUserId/friend/:targetUserId/request                              io.fitcentive.social.controllers.UserRelationshipsController.requestToFriendUser(currentUserId: java.util.UUID, targetUserId: java.util.UUID)
 POST    /api/social/user/:targetUserId/friend/:requestingUserId                                   io.fitcentive.social.controllers.UserRelationshipsController.applyUserFriendRequestDecision(targetUserId: java.util.UUID, requestingUserId: java.util.UUID)

@@ -44,6 +44,16 @@ class UserRelationshipsController @Inject() (
       }
     }
 
+  def searchUserFriends(implicit userId: UUID, query: String, skip: Int = 0, limit: Int = 50): Action[AnyContent] =
+    userAuthAction.async { implicit request =>
+      rejectIfNotEntitled {
+        userRelationshipsApi
+          .searchUserFriends(userId, query, skip, limit)
+          .map(users => Ok(Json.toJson(users)))
+          .recover(resultErrorAsyncHandler)
+      }
+    }
+
   def requestToFriendUser(currentUserId: UUID, targetUserId: UUID): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
       rejectIfNotEntitled {

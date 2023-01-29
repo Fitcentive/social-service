@@ -13,6 +13,7 @@ trait UserRelationshipsRepository {
   def upsertUser(user: PublicUserProfile): Future[PublicUserProfile]
   def getUserIfFriendsWithOtherUser(currentUser: UUID, otherUser: UUID): Future[Option[PublicUserProfile]]
   def getUserFriends(userId: UUID, skip: Int, limit: Int): Future[Seq[PublicUserProfile]]
+  def searchUserFriends(userId: UUID, searchQuery: String, skip: Int, limit: Int): Future[Seq[PublicUserProfile]]
   def makeUserFriendsWithOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit]
   def makeUserUnfriendOther(requestingUserId: UUID, targetUserId: UUID): Future[Unit]
 }
