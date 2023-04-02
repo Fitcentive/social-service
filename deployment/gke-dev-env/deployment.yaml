@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: social-service
-          image: gcr.io/fitcentive-dev/social:1.0
+          image: gcr.io/fitcentive-dev-02/social:1.0
           imagePullPolicy: Always
           resources:
             requests:
@@ -50,7 +50,7 @@ spec:
                 name: social-service-service-account-credentials
           env:
             - name: GCP_PROJECT_NAME
-              value: "fitcentive-dev"
+              value: "fitcentive-dev-02"
             - name: JWT_ISSUER
               value: "https://auth.fitcentive.xyz"
             - name: KEYCLOAK_SERVER_URL
