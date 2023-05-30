@@ -22,5 +22,6 @@ trait SocialMediaRepository {
   def getUsersWhoLikedPost(postId: UUID): Future[Seq[PublicUserProfile]]
   def addCommentToPost(comment: PostComment.Create): Future[PostComment]
   def getCommentsForPost(postId: UUID): Future[Seq[PostComment]]
+  def getMostRecentSpecifiedCommentsForPost(postId: UUID, mostRecentLimit: Int): Future[Seq[PostComment]]
   def getPostById(postId: UUID): Future[Option[Post]]
 }

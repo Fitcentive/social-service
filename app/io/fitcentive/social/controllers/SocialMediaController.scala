@@ -37,6 +37,25 @@ class SocialMediaController @Inject() (
       }
     }
 
+  def getDetailedPostsForUser(implicit
+    userId: UUID,
+    createdBefore: Option[Long] = None,
+    limit: Int = 10,
+    commentPreviewLimit: Int = 3,
+  ): Action[AnyContent] =
+    userAuthAction.async { implicit userRequest =>
+      socialMediaApi
+        .getDetailedPostsByUser(
+          userId,
+          userRequest.authorizedUser.userId,
+          createdBefore.fold(Instant.now.toEpochMilli)(identity),
+          limit,
+          commentPreviewLimit
+        )
+        .map(handleEitherResult(_)(posts => Ok(Json.toJson(posts))))
+        .recover(resultErrorAsyncHandler)
+    }
+
   def getPostsForUser(implicit userId: UUID, createdBefore: Option[Long] = None, limit: Int = 10): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
       socialMediaApi
@@ -48,6 +67,26 @@ class SocialMediaController @Inject() (
         )
         .map(handleEitherResult(_)(posts => Ok(Json.toJson(posts))))
         .recover(resultErrorAsyncHandler)
+    }
+
+  def getDetailedNewsfeedForUser(implicit
+    userId: UUID,
+    createdBefore: Option[Long] = None,
+    limit: Int = 10,
+    mostRecentCommentsLimit: Int = 3,
+  ): Action[AnyContent] =
+    userAuthAction.async { implicit userRequest =>
+      rejectIfNotEntitled {
+        socialMediaApi
+          .getDetailedNewsFeedForUser(
+            userId,
+            createdBefore.fold(Instant.now.toEpochMilli)(identity),
+            limit,
+            mostRecentCommentsLimit
+          )
+          .map(posts => Ok(Json.toJson(posts)))
+          .recover(resultErrorAsyncHandler)
+      }
     }
 
   def getNewsfeedForUser(implicit

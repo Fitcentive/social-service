@@ -3,11 +3,10 @@ package io.fitcentive.social.api
 import cats.data.EitherT
 import io.fitcentive.sdk.error.{DomainError, EntityConflictError, EntityNotAccessible, EntityNotFoundError}
 import io.fitcentive.social.domain.responses.UsersWhoLikedPost
-import io.fitcentive.social.domain.{Post, PostComment, PublicUserProfile}
+import io.fitcentive.social.domain.{DetailedPost, Post, PostComment, PublicUserProfile}
 import io.fitcentive.social.repositories.{SocialMediaRepository, UserRelationshipsRepository}
 import io.fitcentive.social.services.MessageBusService
 
-import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,6 +40,36 @@ class SocialMediaApi @Inject() (
   def createPostForUser(post: Post.Create): Future[Post] =
     socialMediaRepository.createUserPost(post)
 
+  def getDetailedPostsByUser(
+    userId: UUID,
+    requestingUserId: UUID,
+    createdBefore: Long,
+    limit: Int,
+    commentPreviewLimit: Int = 3,
+  ): Future[Either[DomainError, Seq[DetailedPost]]] =
+    (for {
+      _ <- EitherT[Future, DomainError, Boolean] {
+        if (requestingUserId == userId) Future.successful(Right(true))
+        else
+          userRelationshipsRepository
+            .getUserIfFriendsWithOtherUser(requestingUserId, userId)
+            .map(_.map(_ => Right(true)).getOrElse(Left(EntityNotAccessible("User not following other user!"))))
+      }
+      posts <- EitherT.right[DomainError](socialMediaRepository.getPostsForUser(userId, createdBefore, limit))
+      likedUserIds <- EitherT.right[DomainError](
+        Future.sequence(posts.map(post => socialMediaRepository.getUsersWhoLikedPost(post.postId).map(_.map(_.userId))))
+      )
+      postCommentsPreview <- EitherT.right[DomainError](
+        Future.sequence(
+          posts
+            .map(post => socialMediaRepository.getMostRecentSpecifiedCommentsForPost(post.postId, commentPreviewLimit))
+        )
+      )
+    } yield posts
+      .zip(likedUserIds)
+      .zip(postCommentsPreview)
+      .map(r => DetailedPost(post = r._1._1, likedUserIds = r._1._2, mostRecentComments = r._2))).value
+
   def getPostsByUser(
     userId: UUID,
     requestingUserId: UUID,
@@ -57,6 +86,25 @@ class SocialMediaApi @Inject() (
       }
       posts <- EitherT.right[DomainError](socialMediaRepository.getPostsForUser(userId, createdBefore, limit))
     } yield posts).value
+
+  def getDetailedNewsFeedForUser(
+    userId: UUID,
+    createdBefore: Long,
+    limit: Int,
+    commentPreviewLimit: Int = 3
+  ): Future[Seq[DetailedPost]] =
+    for {
+      posts <- socialMediaRepository.getNewsfeedPostsForCurrentUser(userId, createdBefore, limit)
+      likedUserIds <-
+        Future.sequence(posts.map(post => socialMediaRepository.getUsersWhoLikedPost(post.postId).map(_.map(_.userId))))
+      postCommentsPreview <- Future.sequence(
+        posts
+          .map(post => socialMediaRepository.getMostRecentSpecifiedCommentsForPost(post.postId, commentPreviewLimit))
+      )
+    } yield posts
+      .zip(likedUserIds)
+      .zip(postCommentsPreview)
+      .map(r => DetailedPost(post = r._1._1, likedUserIds = r._1._2, mostRecentComments = r._2))
 
   /**
     * Returns posts belong to both current user as well posts of users being followed
