@@ -6,7 +6,7 @@ metadata:
   labels:
     app: social-service
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: social-service
@@ -17,14 +17,14 @@ spec:
     spec:
       containers:
         - name: social-service
-          image: gcr.io/fitcentive-dev-02/social:1.0
+          image: gcr.io/fitcentive-dev-03/social:1.0
           imagePullPolicy: Always
           resources:
             requests:
-              memory: 300Mi
-              cpu: "0.3"
-            limits:
               memory: 500Mi
+              cpu: "0.1"
+            limits:
+              memory: 800Mi
               cpu: "0.5"
           ports:
             - name: http-port
@@ -50,7 +50,7 @@ spec:
                 name: social-service-service-account-credentials
           env:
             - name: GCP_PROJECT_NAME
-              value: "fitcentive-dev-02"
+              value: "fitcentive-dev-03"
             - name: JWT_ISSUER
               value: "https://auth.fitcentive.xyz"
             - name: KEYCLOAK_SERVER_URL
