@@ -11,6 +11,7 @@ import scala.concurrent.Future
 trait SocialMediaRepository {
   def deleteAllCommentsForUser(userId: UUID): Future[Unit]
   def deleteAllPostsForUser(userId: UUID): Future[Unit]
+  def deleteUserPost(userId: UUID, postId: UUID): Future[Unit]
   def deleteAllCommentsForPost(postId: UUID): Future[Unit]
   def createUserPost(post: Post.Create): Future[Post]
   def getPostsForUser(userId: UUID, createdBefore: Long, limit: Int): Future[Seq[Post]]

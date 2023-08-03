@@ -91,6 +91,11 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
       .query[Unit]
       .single(db)
 
+  override def deleteUserPost(userId: UUID, postId: UUID): Future[Unit] =
+    CYPHER_DELETE_SINGLE_POST_FOR_USER(userId, postId)
+      .query[Unit]
+      .single(db)
+
   override def deleteAllCommentsForPost(postId: UUID): Future[Unit] =
     CYPHER_DELETE_ALL_COMMENTS_FOR_POST(postId)
       .query[Unit]
@@ -114,6 +119,12 @@ object NeoTypesSocialMediaRepository {
   private def CYPHER_DELETE_ALL_POSTS_FOR_USER(userId: UUID): DeferredQueryBuilder =
     c"""
      OPTIONAL MATCH (p: Post { userId: $userId })
+     DETACH DELETE p
+     """
+
+  private def CYPHER_DELETE_SINGLE_POST_FOR_USER(userId: UUID, postId: UUID): DeferredQueryBuilder =
+    c"""
+     OPTIONAL MATCH (p: Post { userId: $userId, postId: ${postId}  })
      DETACH DELETE p
      """
 

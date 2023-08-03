@@ -37,6 +37,9 @@ class SocialMediaApi @Inject() (
       _ <- socialMediaRepository.deleteAllPostsForUser(userId)
     } yield ()
 
+  def deletePostForUser(userId: UUID, postId: UUID): Future[Unit] =
+    socialMediaRepository.deleteUserPost(userId, postId)
+
   def createPostForUser(post: Post.Create): Future[Post] =
     socialMediaRepository.createUserPost(post)
 

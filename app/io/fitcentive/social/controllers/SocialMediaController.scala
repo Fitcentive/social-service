@@ -25,6 +25,16 @@ class SocialMediaController @Inject() (
   with PlayControllerOps
   with ServerErrorHandler {
 
+  def deletePostForUser(implicit userId: UUID, postId: UUID): Action[AnyContent] =
+    userAuthAction.async { implicit userRequest =>
+      rejectIfNotEntitled {
+        socialMediaApi
+          .deletePostForUser(userId, postId)
+          .map(_ => NoContent)
+          .recover(resultErrorAsyncHandler)
+      }(userRequest, userId)
+    }
+
   def createPostForUser(implicit userId: UUID): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
       rejectIfNotEntitled {
