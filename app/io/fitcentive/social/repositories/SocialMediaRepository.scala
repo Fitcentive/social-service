@@ -22,7 +22,8 @@ trait SocialMediaRepository {
   def makeUserUnlikePost(userId: UUID, postId: UUID): Future[Unit]
   def getUsersWhoLikedPost(postId: UUID): Future[Seq[PublicUserProfile]]
   def addCommentToPost(comment: PostComment.Create): Future[PostComment]
-  def getCommentsForPost(postId: UUID): Future[Seq[PostComment]]
+  def getAllCommentsForPost(postId: UUID): Future[Seq[PostComment]]
+  def getCommentsForPostInDescCreatedAt(postId: UUID, skip: Int, limit: Int): Future[Seq[PostComment]]
   def getMostRecentSpecifiedCommentsForPost(postId: UUID, mostRecentLimit: Int): Future[Seq[PostComment]]
   def getPostById(postId: UUID): Future[Option[Post]]
 }

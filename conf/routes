@@ -35,6 +35,7 @@ POST    /api/social/user/:userId/post/:postId/comment                           
 
 GET     /api/social/post/:postId                                                                  io.fitcentive.social.controllers.SocialMediaController.getPostById(postId: java.util.UUID)
 GET     /api/social/post/:postId/comment                                                          io.fitcentive.social.controllers.SocialMediaController.getCommentsForPost(postId: java.util.UUID)
+GET     /api/social/post/:postId/comment-chunk                                                    io.fitcentive.social.controllers.SocialMediaController.getCommentsForPostInDescCreatedAt(postId: java.util.UUID, skip: Option[Int] ?= None, limit: Option[Int] ?= None)
 GET     /api/social/post/:postId/liked-users                                                      io.fitcentive.social.controllers.SocialMediaController.getUsersWhoLikedPost(postId: java.util.UUID)
 POST    /api/social/posts/get-liked-user-ids                                                      io.fitcentive.social.controllers.SocialMediaController.getUserIdsWhoLikedPosts
 

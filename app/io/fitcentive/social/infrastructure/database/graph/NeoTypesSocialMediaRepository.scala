@@ -56,8 +56,13 @@ class NeoTypesSocialMediaRepository @Inject() (val db: GraphDb)(implicit val ec:
       .readOnlyQuery[PostComment]
       .list(db)
 
-  override def getCommentsForPost(postId: UUID): Future[Seq[PostComment]] =
+  override def getAllCommentsForPost(postId: UUID): Future[Seq[PostComment]] =
     CYPHER_GET_COMMENTS_FOR_POST(postId)
+      .readOnlyQuery[PostComment]
+      .list(db)
+
+  override def getCommentsForPostInDescCreatedAt(postId: UUID, skip: Int, limit: Int): Future[Seq[PostComment]] =
+    CYPHER_GET_COMMENTS_FOR_POST(postId, skip, limit)
       .readOnlyQuery[PostComment]
       .list(db)
 
@@ -215,6 +220,17 @@ object NeoTypesSocialMediaRepository {
      MATCH (post: Post { postId: $postId })-[rel:HAS_COMMENT]->(comment: Comment)
      WITH comment
      ORDER BY comment.createdAt
+     RETURN comment
+     """
+  }
+
+  private def CYPHER_GET_COMMENTS_FOR_POST(postId: UUID, skip: Int, limit: Int): DeferredQueryBuilder = {
+    c"""
+     MATCH (post: Post { postId: $postId })-[rel:HAS_COMMENT]->(comment: Comment)
+     WITH comment
+     ORDER BY comment.createdAt DESC
+     SKIP $skip
+     LIMIT $limit
      RETURN comment
      """
   }

@@ -18,6 +18,8 @@ class SocialMediaApi @Inject() (
   messageBusService: MessageBusService,
 )(implicit ec: ExecutionContext) {
 
+  val defaultCommentsForPostLimit = 50
+
   /**
     * Deleting a user should delete the following
     * 1. User created posts
@@ -166,7 +168,7 @@ class SocialMediaApi @Inject() (
           .map(_.map(Right.apply).getOrElse(Left(EntityNotFoundError("Post not found!"))))
       )
       // Generate notifications for every distinct user who has participated in the conversation
-      postComments <- EitherT.right[DomainError](socialMediaRepository.getCommentsForPost(post.postId))
+      postComments <- EitherT.right[DomainError](socialMediaRepository.getAllCommentsForPost(post.postId))
       // commentParticipants defined as OP + distinct(commenters)
       commentParticipants = (postComments.map(_.userId) :+ post.userId).distinct
       notificationTargets = commentParticipants.filterNot(_ == comment.userId)
@@ -182,7 +184,14 @@ class SocialMediaApi @Inject() (
     } yield comment).value
 
   def getCommentsForPost(postId: UUID): Future[Seq[PostComment]] =
-    socialMediaRepository.getCommentsForPost(postId)
+    socialMediaRepository.getAllCommentsForPost(postId)
+
+  def getCommentsForPostInDescCreatedAt(postId: UUID, skip: Option[Int], limit: Option[Int]): Future[Seq[PostComment]] =
+    socialMediaRepository.getCommentsForPostInDescCreatedAt(
+      postId,
+      skip.getOrElse(0),
+      limit.getOrElse(defaultCommentsForPostLimit)
+    )
 
   def getPostById(postId: UUID): Future[Either[DomainError, Post]] =
     socialMediaRepository

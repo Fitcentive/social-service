@@ -159,6 +159,18 @@ class SocialMediaController @Inject() (
         .recover(resultErrorAsyncHandler)
     }
 
+  def getCommentsForPostInDescCreatedAt(
+    postId: UUID,
+    skip: Option[Int] = None,
+    limit: Option[Int] = None
+  ): Action[AnyContent] =
+    userAuthAction.async { implicit userRequest =>
+      socialMediaApi
+        .getCommentsForPostInDescCreatedAt(postId, skip, limit)
+        .map(users => Ok(Json.toJson(users)))
+        .recover(resultErrorAsyncHandler)
+    }
+
   def getPostById(postId: UUID): Action[AnyContent] =
     userAuthAction.async { implicit userRequest =>
       socialMediaApi
