@@ -136,9 +136,10 @@ object NeoTypesUserRelationshipsRepository {
   ): DeferredQueryBuilder =
     c"""
        MATCH (u1: User)-[r:IS_FRIENDS_WITH]-(u2: User { userId: $currentUserId})
-       WHERE (u1.firstName CONTAINS $searchQuery 
-       OR u1.lastName CONTAINS $searchQuery
-       OR u1.username CONTAINS $searchQuery)
+       WHERE (
+        toLower(u1.firstName + ' ' + u1.lastName) CONTAINS toLower($searchQuery) 
+        OR toLower(u1.username) CONTAINS toLower($searchQuery)
+       )
        RETURN u1
        SKIP $skip
        LIMIT $limit"""
